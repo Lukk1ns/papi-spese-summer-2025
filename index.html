@@ -47,7 +47,7 @@
   </h1>
 
   <div class="row">
-    <!-- SINISTRA: form e dettagli -->
+    <!-- FORM -->
     <div class="col-md-6 mb-4">
       <div class="card">
         <h4>Spese Serata</h4>
@@ -100,7 +100,7 @@
       </div>
     </div>
 
-    <!-- DESTRA: grafico -->
+    <!-- GRAFICO -->
     <div class="col-md-6">
       <div class="card h-100">
         <h4>Composizione Incasso</h4>
@@ -122,91 +122,85 @@
 <!-- Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-  // Riferimenti
-  const giornoEl    = document.getElementById('giorno');
-  const descEl      = document.getElementById('descSerata');
-  const dataEl      = document.getElementById('data');
-  const voceEl      = document.getElementById('voce');
-  const importoEl   = document.getElementById('importo');
-  const addSpesaBtn = document.getElementById('addSpesa');
-  const listaSpese  = document.getElementById('listaSpese');
-  const posEl       = document.getElementById('pos');
-  const contEl      = document.getElementById('contante');
-  const totaleInc   = document.getElementById('totaleIncasso');
-  const saveBtn     = document.getElementById('saveArchive');
-  const archiveList = document.getElementById('archiveList');
-  const exportBtn   = document.getElementById('exportAll');
+  // ELEMENTI
+  const giornoEl    = document.getElementById('giorno'),
+        descEl      = document.getElementById('descSerata'),
+        dataEl      = document.getElementById('data'),
+        voceEl      = document.getElementById('voce'),
+        importoEl   = document.getElementById('importo'),
+        addSpesaBtn = document.getElementById('addSpesa'),
+        listaSpese  = document.getElementById('listaSpese'),
+        posEl       = document.getElementById('pos'),
+        contEl      = document.getElementById('contante'),
+        totaleInc   = document.getElementById('totaleIncasso'),
+        saveBtn     = document.getElementById('saveArchive'),
+        archiveList = document.getElementById('archiveList'),
+        exportAll   = document.getElementById('exportAll');
 
   let spese = [], chart;
 
-  // Inizializza grafico
+  // inizializza grafico
   function initChart() {
-    const ctx = document.getElementById('pieChart');
-    chart = new Chart(ctx, {
+    chart = new Chart(document.getElementById('pieChart'), {
       type: 'pie',
       data: {
         labels: ['POS','Contante','Spese'],
-        datasets: [{
-          data: [0,0,0],
+        datasets: [{ 
+          data: [0,0,0], 
           backgroundColor: ['#4DB6AC','#64B5F6','#EF5350']
         }]
       },
-      options: {
-        plugins:{ legend:{ labels:{ color:'#fff' } } }
-      }
+      options: { plugins:{ legend:{ labels:{ color:'#fff' } } } }
     });
   }
 
-  // Render lista spese
+  // render spese
   function renderSpese() {
     listaSpese.innerHTML = '';
-    spese.forEach(s=>{
+    spese.forEach(s => {
       const li = document.createElement('li');
       li.textContent = `${s.voce}: €${s.importo.toFixed(2)}`;
       listaSpese.appendChild(li);
     });
   }
 
-  // Aggiorna grafico + totale
+  // aggiorna grafico e totale (ora **somma** spese + pos + contante)
   function updateEverything() {
-    const pos   = parseFloat(posEl.value)||0;
-    const cont  = parseFloat(contEl.value)||0;
-    const sumSp = spese.reduce((a,b)=>a+b.importo,0);
-    const inc   = pos + cont - sumSp;
+    const pos    = parseFloat(posEl.value)||0;
+    const cont   = parseFloat(contEl.value)||0;
+    const sumSp  = spese.reduce((a,b)=>a+b.importo,0);
+    const inc    = pos + cont + sumSp;   // <-- qui uso la somma, non la sottrazione
     totaleInc.textContent = `Totale Incasso: €${inc.toFixed(2)}`;
     chart.data.datasets[0].data = [pos, cont, sumSp];
     chart.update();
   }
 
-  // Aggiungi spesa
+  // aggiungi spesa
   addSpesaBtn.onclick = ()=>{
-    const v = voceEl.value.trim();
-    const imp = parseFloat(importoEl.value);
-    if(!v||isNaN(imp)||imp<=0) {
-      return alert('Inserisci voce e importo validi');
-    }
-    spese.push({voce:v,importo:imp});
+    const v = voceEl.value.trim(),
+          imp = parseFloat(importoEl.value);
+    if(!v||isNaN(imp)||imp<=0) return alert('Inserisci voce e importo validi');
+    spese.push({ voce:v, importo:imp });
     voceEl.value=''; importoEl.value='';
     renderSpese(); updateEverything();
   };
 
-  // Live update POS/Contante
-  [posEl,contEl].forEach(el=>el.oninput=updateEverything);
+  // listener POS e Contante
+  posEl.addEventListener('input', updateEverything);
+  contEl.addEventListener('input', updateEverything);
 
-  // Salva e archivia
+  // salva in archivio
   saveBtn.onclick = ()=>{
     const archivio = JSON.parse(localStorage.getItem('archivioSpese')||'[]');
-    const entry = {
+    archivio.push({
       giorno: giornoEl.value,
-      descrizione: descEl.value.trim()||giornoEl.value,
+      descrizione: descEl.value.trim(),
       data: dataEl.value,
       spese: [...spese],
       pos: parseFloat(posEl.value)||0,
       contante: parseFloat(contEl.value)||0,
-      incasso: ( (parseFloat(posEl.value)||0) + (parseFloat(contEl.value)||0)
-               - spese.reduce((a,b)=>a+b.importo,0) )
-    };
-    archivio.push(entry);
+      incasso: parseFloat((parseFloat(posEl.value)||0) + (parseFloat(contEl.value)||0) + spese.reduce((a,b)=>a+b.importo,0))
+    });
     localStorage.setItem('archivioSpese', JSON.stringify(archivio));
     alert('Serata archiviata!');
     // reset form
@@ -215,80 +209,52 @@
     updateEverything(); renderArchivio();
   };
 
-  // Elimina un entry
+  // render archivio con export/elimina
+  function renderArchivio() {
+    archiveList.innerHTML = '';
+    JSON.parse(localStorage.getItem('archivioSpese')||'[]')
+      .forEach((e,i)=>{
+        const li = document.createElement('li');
+        li.innerHTML = `
+          <strong>${e.data} – ${e.descrizione}</strong><br>
+          Spese: ${e.spese.map(s=>`${s.voce} €${s.importo.toFixed(2)}`).join(', ')}<br>
+          POS: €${e.pos.toFixed(2)}, Contante: €${e.contante.toFixed(2)}, 
+          <em>Incasso: €${e.incasso.toFixed(2)}</em>
+          <div class="entry-buttons">
+            <button class="btn btn-sm btn-secondary me-2" onclick="exportEntry(${i})">Esporta PDF</button>
+            <button class="btn btn-sm btn-danger" onclick="deleteEntry(${i})">Elimina</button>
+          </div>`;
+        archiveList.appendChild(li);
+      });
+  }
+
+  // elimina
   function deleteEntry(idx) {
-    if(!confirm('Elimina questa serata?')) return;
-    const arch = JSON.parse(localStorage.getItem('archivioSpese')||'[]');
-    arch.splice(idx,1);
-    localStorage.setItem('archivioSpese', JSON.stringify(arch));
+    const a = JSON.parse(localStorage.getItem('archivioSpese')||'[]');
+    a.splice(idx,1);
+    localStorage.setItem('archivioSpese', JSON.stringify(a));
     renderArchivio();
   }
 
-  // Esporta singola entry in PDF
-  function exportEntry(e) {
+  // esporta singola
+  function exportEntry(i) {
+    const e = JSON.parse(localStorage.getItem('archivioSpese'))[i];
     const w = window.open('','_blank');
-    const html = `
-      <html><head><title>${e.data} - ${e.descrizione}</title>
-        <style>
-          body{font-family:'Segoe UI',sans-serif;padding:1rem;}
-          h1{font-size:1.5rem;}
-          ul{list-style:none;padding:0;}
-        </style>
-      </head><body>
-        <h1>${e.data} – ${e.descrizione}</h1>
-        <h3>Spese</h3>
-        <ul>${e.spese.map(s=>`<li>${s.voce}: €${s.importo.toFixed(2)}</li>`).join('')}</ul>
-        <p><strong>POS:</strong> €${e.pos.toFixed(2)}</p>
-        <p><strong>Contante:</strong> €${e.contante.toFixed(2)}</p>
-        <p><strong>Incasso:</strong> €${e.incasso.toFixed(2)}</p>
-      </body></html>`;
-    w.document.write(html);
-    w.document.close();
-    w.focus();
-    w.print();
-    w.close();
+    w.document.write(`
+      <h1>${e.data} – ${e.descrizione}</h1>
+      <p>POS: €${e.pos.toFixed(2)}, Contante: €${e.contante.toFixed(2)}</p>
+      <p>Spese:</p><ul>${e.spese.map(s=>`<li>${s.voce}: €${s.importo.toFixed(2)}</li>`).join('')}</ul>
+      <h3>Incasso: €${e.incasso.toFixed(2)}</h3>`);
+    w.document.close(); w.focus(); w.print(); w.close();
   }
 
-  // Render archivio
-  function renderArchivio() {
-    archiveList.innerHTML = '';
-    const arch = JSON.parse(localStorage.getItem('archivioSpese')||'[]');
-    arch.forEach((e,i)=>{
-      const li = document.createElement('li');
-      li.innerHTML = `
-        <div>
-          <strong>${e.data} – ${e.descrizione}</strong>
-          <p>Incasso: €${e.incasso.toFixed(2)}</p>
-        </div>`;
-      // container bottoni
-      const btns = document.createElement('div');
-      btns.className = 'entry-buttons';
-      // export
-      const be = document.createElement('button');
-      be.textContent = 'Esporta PDF';
-      be.className = 'btn btn-sm btn-secondary me-2';
-      be.onclick = ()=>exportEntry(e);
-      btns.appendChild(be);
-      // delete
-      const bd = document.createElement('button');
-      bd.textContent = 'Elimina';
-      bd.className = 'btn btn-sm btn-danger';
-      bd.onclick = ()=>deleteEntry(i);
-      btns.appendChild(bd);
+  // esporta tutte
+  exportAll.onclick = ()=>window.print();
 
-      li.appendChild(btns);
-      archiveList.appendChild(li);
-    });
-  }
-
-  // Esporta tutte
-  exportBtn.onclick = ()=>window.print();
-
-  // boot
+  // avvio
   initChart();
   updateEverything();
   renderArchivio();
 </script>
-
 </body>
 </html>
