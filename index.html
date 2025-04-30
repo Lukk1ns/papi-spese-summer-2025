@@ -85,6 +85,61 @@
   </div>
   <script>
     let archivioSerate = JSON.parse(localStorage.getItem("archivioSerate")) || [];
+    let pieChart;
+
+    function updatePieChart() {
+      const pos = parseFloat(document.getElementById("pos").value) || 0;
+      const cash = parseFloat(document.getElementById("cashInput").value) || 0;
+      const spese = Array.from(document.querySelectorAll("#listaSpese li")).reduce((sum, li) => {
+        const value = parseFloat(li.textContent.split(': €')[1]) || 0;
+        return sum + value;
+      }, 0);
+
+      const data = {
+        labels: ['POS', 'Contante', 'Spese'],
+        datasets: [{
+          data: [pos, cash, spese],
+          backgroundColor: ['#4bc0c0', '#36a2eb', '#ff6384']
+        }]
+      };
+
+      const ctx = document.getElementById("pieCanvas").getContext("2d");
+      if (pieChart) pieChart.destroy();
+      pieChart = new Chart(ctx, {
+        type: 'pie',
+        data: data,
+        options: {
+          plugins: {
+            legend: { labels: { color: '#fff' } },
+            datalabels: {
+              color: '#fff',
+              formatter: value => `€${value.toFixed(2)}`
+            }
+          }
+        },
+        plugins: [ChartDataLabels]
+      });
+
+      document.getElementById("totalPieLabel").textContent = `Totale: €${(pos + cash + spese).toFixed(2)}`;
+      document.getElementById("totale").textContent = `${(pos + cash + spese).toFixed(2)} €`;
+    }
+
+    document.getElementById("pos").addEventListener("input", updatePieChart);
+    document.getElementById("cashInput").addEventListener("input", updatePieChart);
+
+    document.getElementById("speseForm").addEventListener("submit", e => {
+      e.preventDefault();
+      const voce = document.getElementById("voce").value;
+      const importo = parseFloat(document.getElementById("importo").value);
+      if (!voce || isNaN(importo)) return;
+      const li = document.createElement("li");
+      li.textContent = `${voce}: €${importo.toFixed(2)}`;
+      document.getElementById("listaSpese").appendChild(li);
+      document.getElementById("voce").value = "";
+      document.getElementById("importo").value = "";
+      updatePieChart();
+    });
+
     function salvaSerata() {
       const giorno = document.getElementById("giorno").value;
       const descrizione = document.getElementById("descrizioneSerata").value;
@@ -100,8 +155,10 @@
       const nuovaSerata = { id: Date.now(), giorno, descrizione, data, pos, cash, spese, totale };
       archivioSerate.push(nuovaSerata);
       localStorage.setItem("archivioSerate", JSON.stringify(archivioSerate));
-      renderArchivio(); alert("Serata salvata con successo!");
+      renderArchivio();
+      alert("Serata salvata con successo!");
     }
+
     function renderArchivio() {
       const tbody = document.getElementById("archivioBody");
       tbody.innerHTML = "";
@@ -120,6 +177,7 @@
         tbody.appendChild(row);
       });
     }
+
     function eliminaSerata(id) {
       if (confirm("Vuoi eliminare questa serata?")) {
         archivioSerate = archivioSerate.filter(s => s.id !== id);
@@ -127,6 +185,7 @@
         renderArchivio();
       }
     }
+
     function esportaSingolaPDF(id) {
       const serata = archivioSerate.find(s => s.id === id);
       const content = document.createElement("div");
@@ -141,9 +200,11 @@
       `;
       html2pdf().from(content).save(`${serata.data}_${serata.descrizione}.pdf`);
     }
+
     function esportaTuttePDF() {
       archivioSerate.forEach(serata => esportaSingolaPDF(serata.id));
     }
+
     function resetSerata() {
       document.getElementById("voce").value = "";
       document.getElementById("importo").value = "";
@@ -151,19 +212,11 @@
       document.getElementById("pos").value = "";
       document.getElementById("cashInput").value = "";
       document.getElementById("totale").innerText = "0 €";
+      updatePieChart();
     }
-    document.getElementById("speseForm").addEventListener("submit", e => {
-      e.preventDefault();
-      const voce = document.getElementById("voce").value;
-      const importo = parseFloat(document.getElementById("importo").value);
-      if (!voce || isNaN(importo)) return;
-      const li = document.createElement("li");
-      li.textContent = `${voce}: €${importo.toFixed(2)}`;
-      document.getElementById("listaSpese").appendChild(li);
-      document.getElementById("voce").value = "";
-      document.getElementById("importo").value = "";
-    });
+
     renderArchivio();
+    updatePieChart();
   </script>
 </body>
 </html>
