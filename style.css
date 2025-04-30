@@ -1,59 +1,40 @@
 body {
-    margin: 0;
-    font-family: Arial, sans-serif;
-    background-color: #111;
-    color: white;
+  font-family: Arial, sans-serif;
+  background-color: #111;
+  color: #fff;
+  margin: 0;
+  padding: 1rem;
 }
-.container {
-    padding: 20px;
-}
-h1 {
-    text-align: center;
-}
-.white {
-    color: white;
+.title {
+  text-align: center;
+  color: white;
 }
 .highlight {
-    color: #f9c74f;
+  color: #f8b940;
 }
-.grid {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 30px;
+.container {
+  display: flex;
+  flex-wrap: wrap;
 }
-.left, .right {
-    flex: 1 1 45%;
-    min-width: 300px;
+.form-container, .grafico-container {
+  flex: 1;
+  padding: 1rem;
 }
-label, input, button {
-    display: block;
-    margin: 10px 0 5px;
-}
-input {
-    width: 100%;
-    padding: 8px;
-    border: none;
-    border-radius: 4px;
+input, select, button {
+  width: 100%;
+  margin: 0.5rem 0;
+  padding: 0.5rem;
 }
 button {
-    padding: 10px;
-    border: none;
-    border-radius: 4px;
-    margin-top: 10px;
-    cursor: pointer;
-    background-color: #007bff;
-    color: white;
+  background-color: #28a745;
+  color: white;
+  border: none;
 }
-button.green {
-    background-color: #28a745;
+.grafico-container {
+  background-color: white;
+  padding: 1rem;
+  border-radius: 1rem;
 }
-.totale {
-    margin-top: 15px;
-    font-weight: bold;
-}
-canvas {
-    width: 100%;
-    max-width: 400px;
-    background-color: white;
-    border-radius: 8px;
+.archivio-container {
+  margin-top: 2rem;
 }

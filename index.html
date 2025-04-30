@@ -1,43 +1,50 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PAPI SPESE SUMMER 2025</title>
-    <link rel="icon" type="image/x-icon" href="favicon.ico">
-    <link href="style.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>PAPI SPESE SUMMER 2025</title>
+  <link rel="icon" href="favicon.ico" type="image/x-icon"/>
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-    <div class="container">
-        <h1><span class="white">PAPI SPESE</span> <span class="highlight">SUMMER 2025</span></h1>
-        <div class="grid">
-            <div class="left">
-                <label>Giorno</label>
-                <input id="giorno" type="text" placeholder="Venerdì">
-                <label>Descrizione Serata</label>
-                <input id="descrizione" type="text" placeholder="Es: Opening, DJ Guest, ecc.">
-                <label>Data</label>
-                <input id="data" type="date">
-                <label>Voce</label>
-                <input id="voce" type="text">
-                <label>Importo</label>
-                <input id="importo" type="number">
-                <button onclick="aggiungiSpesa()">Aggiungi Spesa</button>
-                <ul id="lista-spese"></ul>
-                <label>POS</label>
-                <input id="pos" type="number" value="0">
-                <label>Contante</label>
-                <input id="contante" type="number" value="0">
-                <p class="totale">Totale Incasso: <span id="totale">0 €</span></p>
-                <button class="green" onclick="salvaSerata()">Salva e Archivia Serata</button>
-            </div>
-            <div class="right">
-                <h3>Composizione Incasso</h3>
-                <canvas id="grafico"></canvas>
-            </div>
-        </div>
+  <h1 class="title">PAPI SPESE <span class="highlight">SUMMER 2025</span></h1>
+  <div class="container">
+    <div class="form-container">
+      <label for="giorno">Giorno</label>
+      <select id="giorno">
+        <option value="Venerdì">Venerdì</option>
+        <option value="Sabato">Sabato</option>
+        <option value="Extra">Extra</option>
+      </select>
+      <label for="descrizione">Descrizione Serata</label>
+      <input type="text" id="descrizione" placeholder="Es: Opening, DJ Guest, ecc." />
+      <label for="data">Data</label>
+      <input type="date" id="data" />
+      <label for="voce">Voce</label>
+      <input type="text" id="voce" />
+      <label for="importo">Importo</label>
+      <input type="number" id="importo" />
+      <button onclick="aggiungiSpesa()">Aggiungi Spesa</button>
+      <ul id="lista-spese"></ul>
+      <label for="pos">POS</label>
+      <input type="number" id="pos" />
+      <label for="contante">Contante</label>
+      <input type="number" id="contante" />
+      <h3 id="totale-incasso">Totale Incasso: 0 €</h3>
+      <button onclick="salvaSerata()">Salva e Archivia Serata</button>
     </div>
-    <script src="app.js"></script>
+    <div class="grafico-container">
+      <h2>Composizione Incasso</h2>
+      <canvas id="grafico"></canvas>
+    </div>
+  </div>
+  <div class="archivio-container">
+    <h2>Archivio Serate</h2>
+    <div id="archivio"></div>
+    <button onclick="esportaTutti()">Esporta Tutti in PDF</button>
+  </div>
+  <script src="app.js"></script>
 </body>
 </html>
