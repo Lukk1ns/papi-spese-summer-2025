@@ -10,213 +10,105 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-  <style>
-    body { background-color: #111; color: #f8f9fa; font-family: 'Segoe UI', sans-serif; }
-    .card { background-color: #1e1e1e; border-radius: 1rem; padding: 1rem; color: #f8f9fa; box-shadow: 0 0 12px rgba(255, 255, 255, 0.05); }
-    label, .form-label, h4, h5, strong, p { color: #ffe066; }
-    .form-control, .form-select { background-color: #2c2c2c; color: #ffffff; border: 1px solid #555; }
-    .btn-primary { background-color: #ff4f00; border: none; }
-    .btn-primary:hover { background-color: #e84300; }
-    .btn-danger { margin-left: 10px; font-size: 0.8rem; }
-    .highlight { color: #ffb347; font-weight: bold; }
-    .spese-lista li { color: #f8f9fa; }
-  </style>
 </head>
 <body>
-  <div class="container py-5">
-    <h1 class="text-center mb-5">PAPI SPESE <span class="highlight">SUMMER 2025</span></h1>
-    <div class="row mb-4">
-      <div class="col-md-6">
-        <div class="card">
-          <h4>Spese Serata</h4>
-          <form id="speseForm">
-            <div class="mb-3"><label for="giorno" class="form-label">Giorno</label>
-              <select id="giorno" class="form-select">
-                <option value="Venerdì">Venerdì</option>
-                <option value="Sabato">Sabato</option>
-                <option value="Serata Extra">Serata Extra</option>
-              </select>
-            </div>
-            <div class="mb-3"><label for="descrizioneSerata" class="form-label">Descrizione Serata</label>
-              <input type="text" class="form-control" id="descrizioneSerata" />
-            </div>
-            <div class="mb-3"><label for="dataSerata" class="form-label">Data</label>
-              <input type="date" class="form-control" id="dataSerata" />
-            </div>
-            <div class="mb-3"><label for="voce" class="form-label">Voce</label>
-              <input type="text" class="form-control" id="voce" />
-            </div>
-            <div class="mb-3"><label for="importo" class="form-label">Importo</label>
-              <input type="number" class="form-control" id="importo" />
-            </div>
-            <button type="submit" class="btn btn-primary">Aggiungi Spesa</button>
-          </form>
-          <ul id="listaSpese" class="mt-3 spese-lista"></ul>
-          <hr />
-          <div class="mb-2"><label>POS</label><input type="number" class="form-control" id="pos" /></div>
-          <div class="mb-2"><label>Contante</label><input type="number" class="form-control" id="cashInput" /></div>
-          <div class="mt-3"><strong>Totale Incasso:</strong> <span id="totale" class="highlight">0 €</span></div>
-          <div class="text-end mt-2"><button class="btn btn-danger" onclick="resetSerata()">Svuota Serata</button></div>
-        </div>
+  <div class="container py-5 text-white">
+    <h1 class="text-center mb-4">PAPI SPESE <span style="color:#ffe066">SUMMER 2025</span></h1>
+    <form id="speseForm" onsubmit="aggiungiSpesa(event)">
+      <div class="mb-2">
+        <label>Voce</label>
+        <input type="text" id="voce" class="form-control" />
       </div>
-      <div class="col-md-6">
-        <div class="card">
-          <h4 class="text-center">Composizione Incasso</h4>
-          <canvas id="pieCanvas"></canvas>
-          <p class="mt-3 text-center" id="totalPieLabel"></p>
-          <div class="text-center">
-            <button class="btn btn-primary mt-3" onclick="salvaSerata()">Salva e Archivia Serata</button>
-            <button class="btn btn-secondary mt-2" onclick="esportaTuttePDF()">Esporta Tutto</button>
-          </div>
-        </div>
+      <div class="mb-2">
+        <label>Importo</label>
+        <input type="number" id="importo" class="form-control" />
       </div>
+      <button type="submit" class="btn btn-primary">Aggiungi Spesa</button>
+    </form>
+    <ul id="listaSpese" class="mt-3"></ul>
+    <div class="mt-3">
+      <label>POS</label>
+      <input type="number" id="pos" class="form-control" />
     </div>
-    <div class="card mt-4">
-      <h4 class="text-center">Archivio Serate Salvate</h4>
-      <div class="table-responsive mt-2">
-        <table class="table table-dark table-bordered mt-3">
-          <thead>
-            <tr><th>Data</th><th>Giorno</th><th>Descrizione</th><th>POS</th><th>Contante</th><th>Spese</th><th>Totale</th><th>Azioni</th></tr>
-          </thead>
-          <tbody id="archivioBody"></tbody>
-        </table>
-      </div>
+    <div class="mt-2">
+      <label>Contante</label>
+      <input type="number" id="cashInput" class="form-control" />
+    </div>
+    <div class="mt-3">
+      <strong>Totale:</strong> <span id="totale" style="color:#ffe066">0 €</span>
+    </div>
+    <button type="button" class="btn btn-success mt-3" onclick="salvaSerata()">Salva e Archivia Serata</button>
+
+    <div class="card mt-5">
+      <h4>Archivio Serate</h4>
+      <table class="table table-dark mt-2">
+        <thead><tr><th>Totale</th><th>Azioni</th></tr></thead>
+        <tbody id="archivioBody"></tbody>
+      </table>
     </div>
   </div>
+
   <script>
-    let archivioSerate = JSON.parse(localStorage.getItem("archivioSerate")) || [];
-    let pieChart;
+    let archivio = JSON.parse(localStorage.getItem('archivio')) || [];
 
-    function updatePieChart() {
-      const pos = parseFloat(document.getElementById("pos").value) || 0;
-      const cash = parseFloat(document.getElementById("cashInput").value) || 0;
-      const spese = Array.from(document.querySelectorAll("#listaSpese li")).reduce((sum, li) => {
-        const value = parseFloat(li.textContent.split(': €')[1]) || 0;
-        return sum + value;
+    function aggiornaTotale() {
+      const pos = parseFloat(document.getElementById('pos').value) || 0;
+      const cash = parseFloat(document.getElementById('cashInput').value) || 0;
+      const spese = Array.from(document.querySelectorAll('#listaSpese li')).reduce((acc, li) => {
+        return acc + parseFloat(li.dataset.importo);
       }, 0);
-
-      const data = {
-        labels: ['POS', 'Contante', 'Spese'],
-        datasets: [{
-          data: [pos, cash, spese],
-          backgroundColor: ['#4bc0c0', '#36a2eb', '#ff6384']
-        }]
-      };
-
-      const ctx = document.getElementById("pieCanvas").getContext("2d");
-      if (pieChart) pieChart.destroy();
-      pieChart = new Chart(ctx, {
-        type: 'pie',
-        data: data,
-        options: {
-          plugins: {
-            legend: { labels: { color: '#fff' } },
-            datalabels: {
-              color: '#fff',
-              formatter: value => `€${value.toFixed(2)}`
-            }
-          }
-        },
-        plugins: [ChartDataLabels]
-      });
-
-      document.getElementById("totalPieLabel").textContent = `Totale: €${(pos + cash + spese).toFixed(2)}`;
-      document.getElementById("totale").textContent = `${(pos + cash + spese).toFixed(2)} €`;
+      const totale = pos + cash + spese;
+      document.getElementById('totale').innerText = totale.toFixed(2) + ' €';
     }
 
-    document.getElementById("pos").addEventListener("input", updatePieChart);
-    document.getElementById("cashInput").addEventListener("input", updatePieChart);
-
-    document.getElementById("speseForm").addEventListener("submit", e => {
+    function aggiungiSpesa(e) {
       e.preventDefault();
-      const voce = document.getElementById("voce").value;
-      const importo = parseFloat(document.getElementById("importo").value);
+      const voce = document.getElementById('voce').value;
+      const importo = parseFloat(document.getElementById('importo').value);
       if (!voce || isNaN(importo)) return;
-      const li = document.createElement("li");
-      li.textContent = `${voce}: €${importo.toFixed(2)}`;
-      document.getElementById("listaSpese").appendChild(li);
-      document.getElementById("voce").value = "";
-      document.getElementById("importo").value = "";
-      updatePieChart();
-    });
+      const li = document.createElement('li');
+      li.innerText = `${voce}: €${importo.toFixed(2)}`;
+      li.dataset.importo = importo;
+      document.getElementById('listaSpese').appendChild(li);
+      document.getElementById('voce').value = '';
+      document.getElementById('importo').value = '';
+      aggiornaTotale();
+    }
 
     function salvaSerata() {
-      const giorno = document.getElementById("giorno").value;
-      const descrizione = document.getElementById("descrizioneSerata").value;
-      const data = document.getElementById("dataSerata").value;
-      const pos = parseFloat(document.getElementById("pos").value) || 0;
-      const cash = parseFloat(document.getElementById("cashInput").value) || 0;
-      const speseList = document.querySelectorAll("#listaSpese li");
-      const spese = Array.from(speseList).map(li => {
-        const parts = li.textContent.split(": €");
-        return { voce: parts[0], importo: parseFloat(parts[1]) };
+      const pos = parseFloat(document.getElementById('pos').value) || 0;
+      const cash = parseFloat(document.getElementById('cashInput').value) || 0;
+      const spese = Array.from(document.querySelectorAll('#listaSpese li')).map(li => {
+        return { voce: li.innerText.split(':')[0], importo: parseFloat(li.dataset.importo) };
       });
       const totale = pos + cash + spese.reduce((sum, s) => sum + s.importo, 0);
-      const nuovaSerata = { id: Date.now(), giorno, descrizione, data, pos, cash, spese, totale };
-      archivioSerate.push(nuovaSerata);
-      localStorage.setItem("archivioSerate", JSON.stringify(archivioSerate));
+      const nuova = { id: Date.now(), totale };
+      archivio.push(nuova);
+      localStorage.setItem('archivio', JSON.stringify(archivio));
       renderArchivio();
-      alert("Serata salvata con successo!");
+      alert('Serata salvata!');
     }
 
     function renderArchivio() {
-      const tbody = document.getElementById("archivioBody");
-      tbody.innerHTML = "";
-      archivioSerate.forEach(serata => {
-        const row = document.createElement("tr");
-        row.innerHTML = `
-          <td>${serata.data}</td><td>${serata.giorno}</td><td>${serata.descrizione}</td>
-          <td>€${serata.pos.toFixed(2)}</td><td>€${serata.cash.toFixed(2)}</td>
-          <td>€${serata.spese.reduce((sum, s) => sum + s.importo, 0).toFixed(2)}</td>
-          <td>€${serata.totale.toFixed(2)}</td>
-          <td>
-            <button class="btn btn-sm btn-danger" onclick="eliminaSerata(${serata.id})">Elimina</button>
-            <button class="btn btn-sm btn-secondary mt-1" onclick="esportaSingolaPDF(${serata.id})">Esporta</button>
-          </td>
-        `;
-        tbody.appendChild(row);
+      const body = document.getElementById('archivioBody');
+      body.innerHTML = '';
+      archivio.forEach(s => {
+        const row = document.createElement('tr');
+        row.innerHTML = `<td>€${s.totale.toFixed(2)}</td><td><button class='btn btn-danger btn-sm' onclick='eliminaSerata(${s.id})'>Elimina</button></td>`;
+        body.appendChild(row);
       });
     }
 
     function eliminaSerata(id) {
-      if (confirm("Vuoi eliminare questa serata?")) {
-        archivioSerate = archivioSerate.filter(s => s.id !== id);
-        localStorage.setItem("archivioSerate", JSON.stringify(archivioSerate));
-        renderArchivio();
-      }
+      archivio = archivio.filter(s => s.id !== id);
+      localStorage.setItem('archivio', JSON.stringify(archivio));
+      renderArchivio();
     }
 
-    function esportaSingolaPDF(id) {
-      const serata = archivioSerate.find(s => s.id === id);
-      const content = document.createElement("div");
-      content.innerHTML = `
-        <h3>${serata.data} - ${serata.giorno}</h3>
-        <p><strong>${serata.descrizione}</strong></p>
-        <p>POS: €${serata.pos.toFixed(2)}</p>
-        <p>Contante: €${serata.cash.toFixed(2)}</p>
-        <p>Totale Spese: €${serata.spese.reduce((sum, s) => sum + s.importo, 0).toFixed(2)}</p>
-        <p><strong>Totale Incasso: €${serata.totale.toFixed(2)}</strong></p>
-        <ul>${serata.spese.map(s => `<li>${s.voce}: €${s.importo.toFixed(2)}</li>`).join("")}</ul>
-      `;
-      html2pdf().from(content).save(`${serata.data}_${serata.descrizione}.pdf`);
-    }
-
-    function esportaTuttePDF() {
-      archivioSerate.forEach(serata => esportaSingolaPDF(serata.id));
-    }
-
-    function resetSerata() {
-      document.getElementById("voce").value = "";
-      document.getElementById("importo").value = "";
-      document.getElementById("listaSpese").innerHTML = "";
-      document.getElementById("pos").value = "";
-      document.getElementById("cashInput").value = "";
-      document.getElementById("totale").innerText = "0 €";
-      updatePieChart();
-    }
+    document.getElementById('pos').addEventListener('input', aggiornaTotale);
+    document.getElementById('cashInput').addEventListener('input', aggiornaTotale);
 
     renderArchivio();
-    updatePieChart();
   </script>
 </body>
 </html>
