@@ -1,3 +1,3 @@
 
-// Placeholder per JS funzionante (grafico, spese, salvataggio, ecc.)
-console.log("App JS funzionante caricato.");
+// Placeholder JavaScript for now
+console.log("App loaded");
