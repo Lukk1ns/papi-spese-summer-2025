@@ -1,0 +1,35 @@
+
+body {
+  font-family: sans-serif;
+  background-color: #111;
+  color: white;
+  margin: 0;
+  padding: 20px;
+}
+.container {
+  max-width: 1000px;
+  margin: auto;
+}
+h1 {
+  text-align: center;
+  color: gold;
+}
+.form-section, .grafico-section, .archivio-section {
+  margin-top: 30px;
+}
+input, button {
+  display: block;
+  margin: 10px 0;
+  padding: 10px;
+}
+.btn {
+  border: none;
+  cursor: pointer;
+}
+.green { background: green; color: white; }
+.blue { background: #007bff; color: white; }
+.red { background: red; color: white; }
+.gray { background: #555; color: white; }
+#totale { font-weight: bold; color: gold; }
+table { width: 100%; margin-top: 20px; border-collapse: collapse; }
+th, td { border: 1px solid #333; padding: 10px; text-align: center; }
