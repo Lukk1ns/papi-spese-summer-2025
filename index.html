@@ -4,255 +4,45 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>PAPI SPESE SUMMER 2025</title>
-  <link rel="icon" href="favicon.ico" type="image/x-icon" />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="icon" href="favicon.ico" type="image/x-icon">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <style>
-    body {
-      background-color: #111;
-      color: #fff;
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 1rem;
-    }
-    h1 {
-      text-align: center;
-      font-size: 2rem;
-      margin-bottom: 1rem;
-    }
-    .highlight {
-      color: #f8b947;
-      font-weight: bold;
-    }
-    .container {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: space-between;
-    }
-    .left, .right {
-      flex: 1;
-      min-width: 300px;
-      margin: 1rem;
-    }
-    label {
-      display: block;
-      margin-top: 0.5rem;
-    }
-    input, select, button {
-      width: 100%;
-      padding: 0.5rem;
-      margin-top: 0.2rem;
-      margin-bottom: 0.5rem;
-    }
-    #graficoIncasso {
-      width: 100%;
-      max-width: 400px;
-      background-color: transparent;
-    }
-    #speseList {
-      margin-top: 1rem;
-    }
-    #archivio {
-      margin-top: 2rem;
-    }
-    .archivio-item {
-      background-color: #222;
-      padding: 1rem;
-      margin-bottom: 1rem;
-      border-radius: 8px;
-    }
-    .delete-btn {
-      background-color: red;
-      color: white;
-      padding: 0.3rem 0.6rem;
-      border: none;
-      border-radius: 4px;
-      float: right;
-      cursor: pointer;
-    }
-    .btn {
-      background-color: green;
-      color: white;
-      border: none;
-      padding: 0.6rem;
-      cursor: pointer;
-      margin-top: 0.5rem;
-    }
-    .btn-pdf {
-      background-color: #555;
-      color: white;
-      border: none;
-      padding: 0.6rem;
-      cursor: pointer;
-      width: 100%;
-      margin-top: 1rem;
-    }
-  </style>
 </head>
 <body>
-  <h1><span class="highlight">PAPI SPESE</span> SUMMER 2025</h1>
-
+  <h1 class="title">PAPI SPESE <span class="highlight">SUMMER 2025</span></h1>
   <div class="container">
-    <div class="left">
-      <label for="giorno">Giorno</label>
+    <div class="left-panel">
+      <label>Giorno</label>
       <select id="giorno">
         <option value="Venerdì">Venerdì</option>
         <option value="Sabato">Sabato</option>
         <option value="Extra">Extra</option>
       </select>
-
-      <label for="descrizione">Descrizione Serata</label>
+      <label>Descrizione Serata</label>
       <input type="text" id="descrizione" placeholder="Es: Opening, Guest, ecc." />
-
-      <label for="data">Data</label>
+      <label>Data</label>
       <input type="date" id="data" />
-
-      <label for="voce">Voce</label>
+      <label>Voce</label>
       <input type="text" id="voce" />
-
-      <label for="importo">Importo</label>
+      <label>Importo</label>
       <input type="number" id="importo" />
-
-      <button onclick="aggiungiSpesa()" style="background-color:#007bff;">Aggiungi Spesa</button>
-
-      <ul id="speseList"></ul>
-
-      <label for="pos">POS</label>
+      <button onclick="aggiungiSpesa()">Aggiungi Spesa</button>
+      <ul id="lista-spese"></ul>
+      <label>POS</label>
       <input type="number" id="pos" />
-
-      <label for="contante">Contante</label>
+      <label>Contante</label>
       <input type="number" id="contante" />
-
-      <h3>Totale Incasso: <span id="totaleIncasso">0 €</span></h3>
-
-      <button onclick="salvaSerata()" class="btn">Salva e Archivia Serata</button>
+      <p id="totale">Totale Incasso: 0 €</p>
+      <button onclick="salvaSerata()">Salva e Archivia Serata</button>
     </div>
-
-    <div class="right">
+    <div class="right-panel">
       <h3>Composizione Incasso</h3>
       <canvas id="graficoIncasso"></canvas>
     </div>
   </div>
-
-  <div id="archivio">
-    <h2>Archivio Serate</h2>
-    <div id="listaArchivio"></div>
-    <button onclick="esportaTuttiPDF()" class="btn-pdf">Esporta Tutti in PDF</button>
-  </div>
-
-  <script>
-    let spese = [];
-
-    function aggiornaTotale() {
-      const pos = Number(document.getElementById("pos").value) || 0;
-      const contante = Number(document.getElementById("contante").value) || 0;
-      const totale = pos + contante;
-      document.getElementById("totaleIncasso").textContent = totale.toFixed(2) + " €";
-    }
-
-    document.getElementById("pos").addEventListener("input", aggiornaTotale);
-    document.getElementById("contante").addEventListener("input", aggiornaTotale);
-
-    function aggiungiSpesa() {
-      const voce = document.getElementById("voce").value;
-      const importo = parseFloat(document.getElementById("importo").value);
-      if (voce && importo) {
-        spese.push({ voce, importo });
-        renderSpese();
-        aggiornaGrafico();
-        document.getElementById("voce").value = "";
-        document.getElementById("importo").value = "";
-      }
-    }
-
-    function renderSpese() {
-      const lista = document.getElementById("speseList");
-      lista.innerHTML = "";
-      spese.forEach(s => {
-        const li = document.createElement("li");
-        li.textContent = `${s.voce}: €${s.importo.toFixed(2)}`;
-        lista.appendChild(li);
-      });
-    }
-
-    let chart;
-    function aggiornaGrafico() {
-      const pos = Number(document.getElementById("pos").value) || 0;
-      const contante = Number(document.getElementById("contante").value) || 0;
-      const totaleSpese = spese.reduce((acc, val) => acc + val.importo, 0);
-
-      const ctx = document.getElementById("graficoIncasso").getContext("2d");
-      if (chart) chart.destroy();
-      chart = new Chart(ctx, {
-        type: "pie",
-        data: {
-          labels: ["POS", "Contante", "Spese"],
-          datasets: [{
-            data: [pos, contante, totaleSpese],
-            backgroundColor: ["#69c", "#39f", "#f66"]
-          }]
-        }
-      });
-    }
-
-    function salvaSerata() {
-      const giorno = document.getElementById("giorno").value;
-      const descrizione = document.getElementById("descrizione").value;
-      const data = document.getElementById("data").value;
-      const pos = Number(document.getElementById("pos").value) || 0;
-      const contante = Number(document.getElementById("contante").value) || 0;
-      const totale = pos + contante;
-      const speseText = spese.map(s => `- ${s.voce}: €${s.importo.toFixed(2)}`).join("\n");
-
-      const archivio = JSON.parse(localStorage.getItem("archivioSerate") || "[]");
-
-      archivio.push({
-        giorno, descrizione, data, spese, pos, contante, totale
-      });
-
-      localStorage.setItem("archivioSerate", JSON.stringify(archivio));
-      spese = [];
-      renderSpese();
-      aggiornaGrafico();
-      aggiornaTotale();
-      aggiornaArchivio();
-    }
-
-    function aggiornaArchivio() {
-      const archivio = JSON.parse(localStorage.getItem("archivioSerate") || "[]");
-      const container = document.getElementById("listaArchivio");
-      container.innerHTML = "";
-      archivio.forEach((serata, index) => {
-        const div = document.createElement("div");
-        div.className = "archivio-item";
-        div.innerHTML = \`
-          <button class="delete-btn" onclick="cancellaSerata(\${index})">X</button>
-          <strong>\${serata.data} - \${serata.descrizione}</strong><br>
-          Giorno: \${serata.giorno}<br>
-          Spese:<br>
-          \${serata.spese.map(s => '- ' + s.voce + ': €' + s.importo.toFixed(2)).join('<br>')}
-          <br>POS: €\${serata.pos}<br>
-          Contante: €\${serata.contante}<br>
-          Totale Incasso: €\${serata.totale.toFixed(2)}<br>
-        \`;
-        container.appendChild(div);
-      });
-    }
-
-    function cancellaSerata(index) {
-      const archivio = JSON.parse(localStorage.getItem("archivioSerate") || "[]");
-      archivio.splice(index, 1);
-      localStorage.setItem("archivioSerate", JSON.stringify(archivio));
-      aggiornaArchivio();
-    }
-
-    function esportaTuttiPDF() {
-      window.print();
-    }
-
-    window.onload = () => {
-      aggiornaArchivio();
-      aggiornaGrafico();
-    };
-  </script>
+  <h2>Archivio Serate</h2>
+  <div id="archivio"></div>
+  <button onclick="esportaTuttiPDF()">Esporta Tutti in PDF</button>
+  <script src="app.js"></script>
 </body>
 </html>
