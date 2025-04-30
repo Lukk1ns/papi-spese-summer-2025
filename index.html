@@ -1,16 +1,203 @@
-
 <!DOCTYPE html>
 <html lang="it">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>PAPI SPESE SUMMER 2025</title>
-  <link rel="icon" href="favicon.ico" type="image/x-icon" />
-  <link rel="stylesheet" href="style.css" />
+  <link rel="icon" type="image/x-icon" href="favicon.ico" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      background-color: #111;
+      color: #fff;
+      font-family: 'Segoe UI', sans-serif;
+      padding: 1rem;
+    }
+    h1 {
+      text-align: center;
+      color: #f9b233;
+    }
+    .highlight {
+      color: #f9b233;
+      font-weight: bold;
+    }
+    .form-section {
+      display: flex;
+      gap: 2rem;
+      flex-wrap: wrap;
+    }
+    .form-control {
+      display: flex;
+      flex-direction: column;
+      margin-bottom: 1rem;
+      width: 100%;
+    }
+    .form-control input,
+    .form-control select {
+      padding: 0.5rem;
+      font-size: 1rem;
+      border-radius: 5px;
+      border: none;
+    }
+    button {
+      padding: 0.7rem 1.2rem;
+      font-size: 1rem;
+      cursor: pointer;
+      border: none;
+      border-radius: 5px;
+      margin-top: 0.5rem;
+    }
+    .btn-blue {
+      background-color: #3b82f6;
+      color: white;
+    }
+    .btn-green {
+      background-color: #22c55e;
+      color: white;
+    }
+    .btn-red {
+      background-color: #ef4444;
+      color: white;
+    }
+    canvas {
+      background: none;
+      margin-top: 2rem;
+    }
+    #archivio {
+      margin-top: 2rem;
+    }
+  </style>
 </head>
 <body>
-  <h1>PAPI SPESE <span style="color: orange">SUMMER 2025</span></h1>
-  <div id="app">L'app funzionante verrà qui caricata</div>
-  <script src="app.js"></script>
+  <h1>PAPI SPESE <span class="highlight">SUMMER 2025</span></h1>
+
+  <div class="form-section">
+    <div style="flex: 1;">
+      <div class="form-control">
+        <label>Giorno</label>
+        <select id="giorno">
+          <option value="Venerdì">Venerdì</option>
+          <option value="Sabato">Sabato</option>
+          <option value="Extra">Extra</option>
+        </select>
+      </div>
+      <div class="form-control">
+        <label>Descrizione Serata</label>
+        <input type="text" id="descrizione" placeholder="Es: Opening, DJ Set...">
+      </div>
+      <div class="form-control">
+        <label>Data</label>
+        <input type="date" id="data">
+      </div>
+      <div class="form-control">
+        <label>Voce</label>
+        <input type="text" id="voce">
+      </div>
+      <div class="form-control">
+        <label>Importo</label>
+        <input type="number" id="importo">
+        <button class="btn-blue" onclick="aggiungiSpesa()">Aggiungi Spesa</button>
+        <ul id="listaSpese"></ul>
+      </div>
+      <div class="form-control">
+        <label>POS</label>
+        <input type="number" id="pos" oninput="aggiornaGrafico()">
+      </div>
+      <div class="form-control">
+        <label>Contante</label>
+        <input type="number" id="contante" oninput="aggiornaGrafico()">
+      </div>
+      <p><strong>Totale Incasso: <span id="totaleIncasso">0</span> €</strong></p>
+      <button class="btn-green" onclick="archiviaSerata()">Salva e Archivia Serata</button>
+    </div>
+    <div style="flex: 1;">
+      <h3>Composizione Incasso</h3>
+      <canvas id="grafico" width="400" height="400"></canvas>
+    </div>
+  </div>
+
+  <div id="archivio">
+    <h2>Archivio Serate</h2>
+    <div id="elencoSerate"></div>
+  </div>
+
+  <script>
+    let spese = [];
+    const lista = document.getElementById("listaSpese");
+    const totale = document.getElementById("totaleIncasso");
+    const posInput = document.getElementById("pos");
+    const contanteInput = document.getElementById("contante");
+
+    const ctx = document.getElementById("grafico").getContext("2d");
+    const chart = new Chart(ctx, {
+      type: 'pie',
+      data: {
+        labels: ['POS', 'Contante', 'Spese'],
+        datasets: [{
+          label: 'Composizione',
+          data: [0, 0, 0],
+          backgroundColor: ['#38bdf8', '#60a5fa', '#f87171'],
+          borderColor: '#000',
+          borderWidth: 1
+        }]
+      },
+    });
+
+    function aggiornaGrafico() {
+      const pos = parseFloat(posInput.value) || 0;
+      const cash = parseFloat(contanteInput.value) || 0;
+      const totalSpese = spese.reduce((sum, voce) => sum + voce.importo, 0);
+      const incasso = pos + cash;
+      totale.textContent = incasso.toFixed(2);
+      chart.data.datasets[0].data = [pos, cash, totalSpese];
+      chart.update();
+    }
+
+    function aggiungiSpesa() {
+      const voce = document.getElementById("voce").value;
+      const importo = parseFloat(document.getElementById("importo").value);
+      if (!voce || isNaN(importo)) return;
+      spese.push({ voce, importo });
+      const li = document.createElement("li");
+      li.textContent = `${voce}: €${importo.toFixed(2)}`;
+      lista.appendChild(li);
+      aggiornaGrafico();
+      document.getElementById("voce").value = "";
+      document.getElementById("importo").value = "";
+    }
+
+    function archiviaSerata() {
+      const giorno = document.getElementById("giorno").value;
+      const descrizione = document.getElementById("descrizione").value;
+      const data = document.getElementById("data").value;
+      const pos = parseFloat(posInput.value) || 0;
+      const cash = parseFloat(contanteInput.value) || 0;
+      const total = pos + cash;
+      const id = `${data}-${descrizione}`;
+      const dettagli = {
+        id, giorno, descrizione, data, spese, pos, cash, totale: total
+      };
+      let archivio = JSON.parse(localStorage.getItem("archivio")) || [];
+      archivio.push(dettagli);
+      localStorage.setItem("archivio", JSON.stringify(archivio));
+      alert("Serata archiviata!");
+      location.reload();
+    }
+
+    function caricaArchivio() {
+      const archivio = JSON.parse(localStorage.getItem("archivio")) || [];
+      const elenco = document.getElementById("elencoSerate");
+      archivio.forEach(serata => {
+        const div = document.createElement("div");
+        div.innerHTML = `<p><strong>${serata.data} - ${serata.descrizione}</strong><br>
+          Spese: ${serata.spese.map(s => `${s.voce}: €${s.importo}`).join(", ")}<br>
+          POS: €${serata.pos}, Contante: €${serata.cash}, Incasso: €${serata.totale}
+        </p>`;
+        elenco.appendChild(div);
+      });
+    }
+
+    window.onload = caricaArchivio;
+  </script>
 </body>
 </html>
