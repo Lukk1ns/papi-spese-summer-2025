@@ -1,3 +1,1 @@
-
-// Placeholder JavaScript for now
-console.log("App loaded");
+console.log("App JS caricato correttamente!");

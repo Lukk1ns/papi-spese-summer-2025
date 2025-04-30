@@ -1,13 +1,9 @@
-
 body {
   background-color: #111;
-  color: #fff;
-  font-family: Arial, sans-serif;
-  margin: 0;
-  padding: 2rem;
-}
-h1 {
+  color: white;
+  font-family: 'Segoe UI', sans-serif;
   text-align: center;
+  margin-top: 3rem;
 }
 .highlight {
   color: orange;
