@@ -1,207 +1,171 @@
+
 <!DOCTYPE html>
 <html lang="it">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>PAPI SPESE SUMMER 2025</title>
-  <link rel="icon" type="image/x-icon" href="favicon.ico" />
+  <link rel="icon" href="favicon.ico" type="image/x-icon">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     body {
       background-color: #111;
       color: white;
-      font-family: Arial, sans-serif;
+      font-family: 'Segoe UI', sans-serif;
       margin: 0;
       padding: 1rem;
     }
     h1 {
       text-align: center;
-      color: #fbbf24;
+      color: #f8bf3c;
     }
-    .container {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 2rem;
-    }
-    .form-section, .chart-section {
-      flex: 1;
-      min-width: 300px;
+    .highlight {
+      color: #f8bf3c;
+      font-weight: bold;
     }
     input, select, button {
       display: block;
       width: 100%;
+      margin: 0.5rem 0;
       padding: 0.5rem;
-      margin: 0.5rem 0;
-      border-radius: 0.5rem;
-      border: none;
+      font-size: 1rem;
     }
-    button {
-      background-color: #22c55e;
-      color: white;
-      cursor: pointer;
+    .form-container {
+      max-width: 600px;
+      margin: 0 auto;
     }
-    button.danger {
-      background-color: #ef4444;
+    .chart-container {
+      max-width: 600px;
+      margin: 2rem auto;
     }
-    canvas {
-      background-color: #00000000;
+    .expense-list {
+      margin-top: 1rem;
     }
-    .spese-list {
-      margin: 0.5rem 0;
-      padding-left: 1.2rem;
-    }
-    .archivio {
+    .archive-section {
       margin-top: 2rem;
     }
-    .archivio-item {
-      background: #1f2937;
+    .archive-item {
+      background: #222;
       padding: 1rem;
-      margin-bottom: 1rem;
-      border-radius: 0.5rem;
+      margin: 0.5rem 0;
+      border-radius: 8px;
     }
-    .archivio-item h3 {
-      margin-top: 0;
+    .btn {
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      cursor: pointer;
     }
-    .pdf-btn {
-      background-color: #3b82f6;
-      margin-top: 0.5rem;
+    .btn-blue {
+      background-color: #337af7;
+    }
+    .btn:hover {
+      opacity: 0.9;
     }
   </style>
 </head>
 <body>
-  <h1>PAPI SPESE <span style="color:#facc15;">SUMMER 2025</span></h1>
-  <div class="container">
-    <div class="form-section">
-      <select id="giorno">
-        <option value="Venerdì">Venerdì</option>
-        <option value="Sabato">Sabato</option>
-        <option value="Extra">Extra</option>
-      </select>
-      <input type="text" id="descrizione" placeholder="Descrizione Serata">
-      <input type="date" id="data">
-      <input type="text" id="voce" placeholder="Voce">
-      <input type="number" id="importo" placeholder="Importo">
-      <button onclick="aggiungiSpesa()">Aggiungi Spesa</button>
-      <ul id="lista-spese" class="spese-list"></ul>
-      <input type="number" id="pos" placeholder="POS">
-      <input type="number" id="contante" placeholder="Contante">
-      <p><strong>Totale Incasso:</strong> <span id="totale">0</span> €</p>
-      <button onclick="archiviaSerata()">Salva e Archivia Serata</button>
-    </div>
-    <div class="chart-section">
-      <h3>Composizione Incasso</h3>
-      <canvas id="grafico"></canvas>
-    </div>
+  <h1><span style="color: white;">PAPI SPESE</span> <span class="highlight">SUMMER 2025</span></h1>
+  <div class="form-container">
+    <select id="giorno">
+      <option value="Venerdì">Venerdì</option>
+      <option value="Sabato">Sabato</option>
+      <option value="Extra">Extra</option>
+    </select>
+    <input type="text" id="descrizione" placeholder="Descrizione Serata">
+    <input type="date" id="data">
+    <input type="text" id="voce" placeholder="Voce">
+    <input type="number" id="importo" placeholder="Importo">
+    <button class="btn btn-blue" onclick="aggiungiSpesa()">Aggiungi Spesa</button>
+    <ul id="listaSpese" class="expense-list"></ul>
+    <input type="number" id="pos" placeholder="POS">
+    <input type="number" id="contante" placeholder="Contante">
+    <p><strong>Totale Incasso: <span id="totaleIncasso">0</span> €</strong></p>
+    <button class="btn" onclick="salvaSerata()">Salva e Archivia Serata</button>
   </div>
-
-  <div class="archivio">
+  <div class="chart-container">
+    <canvas id="graficoIncasso"></canvas>
+  </div>
+  <div class="archive-section">
     <h2>Archivio Serate</h2>
-    <div id="archivio-container"></div>
-    <button class="pdf-btn" onclick="esportaTutti()">Esporta Tutti in PDF</button>
+    <div id="archivio"></div>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script>
     let spese = [];
-    const graficoCtx = document.getElementById('grafico').getContext('2d');
-    let grafico;
+
+    function aggiungiSpesa() {
+      const voce = document.getElementById("voce").value;
+      const importo = parseFloat(document.getElementById("importo").value);
+      if (voce && !isNaN(importo)) {
+        spese.push({ voce, importo });
+        aggiornaListaSpese();
+        aggiornaGrafico();
+      }
+    }
+
+    function aggiornaListaSpese() {
+      const lista = document.getElementById("listaSpese");
+      lista.innerHTML = '';
+      spese.forEach(s => {
+        const li = document.createElement("li");
+        li.textContent = `${s.voce}: €${s.importo.toFixed(2)}`;
+        lista.appendChild(li);
+      });
+    }
+
+    function calcolaTotaleSpese() {
+      return spese.reduce((acc, curr) => acc + curr.importo, 0);
+    }
 
     function aggiornaGrafico() {
-      const pos = parseFloat(document.getElementById('pos').value) || 0;
-      const contante = parseFloat(document.getElementById('contante').value) || 0;
-      const speseTot = spese.reduce((sum, s) => sum + s.importo, 0);
+      const pos = parseFloat(document.getElementById("pos").value) || 0;
+      const contante = parseFloat(document.getElementById("contante").value) || 0;
+      const totaleSpese = calcolaTotaleSpese();
       const totale = pos + contante;
+      document.getElementById("totaleIncasso").textContent = totale.toFixed(2);
 
-      document.getElementById('totale').innerText = totale.toFixed(2);
-
-      if (grafico) grafico.destroy();
-
-      grafico = new Chart(graficoCtx, {
+      if (window.pieChart) window.pieChart.destroy();
+      const ctx = document.getElementById("graficoIncasso").getContext("2d");
+      window.pieChart = new Chart(ctx, {
         type: 'pie',
         data: {
           labels: ['POS', 'Contante', 'Spese'],
           datasets: [{
-            data: [pos, contante, speseTot],
-            backgroundColor: ['#34d399', '#60a5fa', '#f87171']
+            data: [pos, contante, totaleSpese],
+            backgroundColor: ['#66cccc', '#6699ff', '#ff6666']
           }]
         }
       });
     }
 
-    function aggiungiSpesa() {
-      const voce = document.getElementById('voce').value;
-      const importo = parseFloat(document.getElementById('importo').value);
-      if (!voce || isNaN(importo)) return;
+    document.getElementById("pos").addEventListener("input", aggiornaGrafico);
+    document.getElementById("contante").addEventListener("input", aggiornaGrafico);
 
-      spese.push({ voce, importo });
-      const li = document.createElement('li');
-      li.textContent = `${voce}: €${importo.toFixed(2)}`;
-      document.getElementById('lista-spese').appendChild(li);
+    function salvaSerata() {
+      const giorno = document.getElementById("giorno").value;
+      const descrizione = document.getElementById("descrizione").value;
+      const data = document.getElementById("data").value;
+      const pos = parseFloat(document.getElementById("pos").value) || 0;
+      const contante = parseFloat(document.getElementById("contante").value) || 0;
+      const incasso = pos + contante;
+      const speseDettagli = spese.map(s => `${s.voce}: €${s.importo.toFixed(2)}`).join(', ');
 
-      document.getElementById('voce').value = '';
-      document.getElementById('importo').value = '';
-      aggiornaGrafico();
-    }
+      const archivio = document.getElementById("archivio");
+      const div = document.createElement("div");
+      div.className = "archive-item";
+      div.innerHTML = \`
+        <strong>\${data} - \${descrizione}</strong><br>
+        Giorno: \${giorno}<br>
+        Spese: \${speseDettagli}<br>
+        POS: €\${pos.toFixed(2)} | Contante: €\${contante.toFixed(2)}<br>
+        Incasso Totale: €\${incasso.toFixed(2)}
+      \`;
+      archivio.prepend(div);
 
-    function archiviaSerata() {
-      const giorno = document.getElementById('giorno').value;
-      const descrizione = document.getElementById('descrizione').value;
-      const data = document.getElementById('data').value;
-      const pos = parseFloat(document.getElementById('pos').value) || 0;
-      const contante = parseFloat(document.getElementById('contante').value) || 0;
-      const totale = pos + contante;
-
-      const id = Date.now();
-      const serata = { id, giorno, descrizione, data, spese, pos, contante, totale };
-      const archivio = JSON.parse(localStorage.getItem('archivio') || '[]');
-      archivio.push(serata);
-      localStorage.setItem('archivio', JSON.stringify(archivio));
-
-      alert("Serata archiviata!");
       spese = [];
-      document.getElementById('lista-spese').innerHTML = '';
-      aggiornaGrafico();
-      mostraArchivio();
+      document.getElementById("listaSpese").innerHTML = '';
     }
-
-    function mostraArchivio() {
-      const archivio = JSON.parse(localStorage.getItem('archivio') || '[]');
-      const container = document.getElementById('archivio-container');
-      container.innerHTML = '';
-      archivio.forEach(s => {
-        const div = document.createElement('div');
-        div.className = 'archivio-item';
-        div.innerHTML = \`
-          <h3>\${s.data} - \${s.descrizione}</h3>
-          <ul>\${s.spese.map(sp => '<li>' + sp.voce + ': €' + sp.importo.toFixed(2) + '</li>').join('')}</ul>
-          <p>POS: €\${s.pos.toFixed(2)}</p>
-          <p>Contante: €\${s.contante.toFixed(2)}</p>
-          <p><strong>Totale: €\${s.totale.toFixed(2)}</strong></p>
-          <button class="pdf-btn" onclick="esportaSingola(\${s.id})">Esporta in PDF</button>
-          <button class="danger" onclick="cancellaSerata(\${s.id})">Elimina</button>
-        \`;
-        container.appendChild(div);
-      });
-    }
-
-    function cancellaSerata(id) {
-      let archivio = JSON.parse(localStorage.getItem('archivio') || '[]');
-      archivio = archivio.filter(s => s.id !== id);
-      localStorage.setItem('archivio', JSON.stringify(archivio));
-      mostraArchivio();
-    }
-
-    function esportaSingola(id) {
-      alert("Questa funzione PDF è simulata per ora.");
-    }
-
-    function esportaTutti() {
-      alert("Esportazione PDF di tutte le serate (simulazione).");
-    }
-
-    window.onload = () => {
-      aggiornaGrafico();
-      mostraArchivio();
-    };
   </script>
 </body>
 </html>
