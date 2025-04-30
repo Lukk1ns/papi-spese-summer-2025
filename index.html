@@ -2,217 +2,259 @@
 <html lang="it">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>PAPI SPESE SUMMER 2025</title>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js"></script>
+
+  <!-- Bootstrap CSS -->
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+  />
+
   <style>
-    * { box-sizing:border-box; }
-    body { margin:0; background:#111; color:#fff; font-family:sans-serif; }
-    h1 { text-align:center; margin:1rem 0; }
-    .container { display:flex; flex-wrap:wrap; padding:1rem; }
-    .form-col { flex:1 1 300px; padding-right:1rem; }
-    .chart-col{ flex:1 1 300px; }
-    label{ display:block; margin:0.5rem 0 0.2rem;}
-    input,select,button{width:100%;padding:0.5rem;border:none;border-radius:4px;font-size:1rem;}
-    input,select { background:#222; color:#fff; }
-    button { cursor:pointer; margin-top:0.5rem; }
-    .btn-add { background:#006bff; color:#fff; }
-    .btn-save{background:#28a745;color:#fff;}
-    .btn-clear{background:#dc3545;color:#fff;}
-    ul { margin:0.5rem 0 1rem 1.2rem; }
-    .archive-list{padding:1rem;}
-    .card{background:#1e1e1e;padding:1rem;margin-bottom:1rem;border-radius:6px;}
-    .card-header{display:flex;justify-content:space-between;align-items:center;}
-    .btn-archive-delete{background:#c62828;color:#fff;padding:0.3rem 0.6rem;border-radius:4px;}
-    .btn-archive-pdf{background:#3949ab;color:#fff;padding:0.3rem 0.6rem;border-radius:4px;margin-left:0.5rem;}
-    canvas{background:transparent!important;}
+    body {
+      background: #111;
+      color: #fff;
+      font-family: 'Segoe UI', sans-serif;
+    }
+    h1,h2,h3,h4,h5,h6,label,
+    .form-label, .btn, #archiveList, #archiveList * {
+      color: #fff !important;
+    }
+    ::placeholder { color: #ccc !important; opacity:1; }
+    .card {
+      background: #1e1e1e;
+      border: none;
+      border-radius: 1rem;
+      box-shadow: 0 0 12px rgba(255,255,255,0.05);
+      padding: 1rem;
+    }
+    .btn-primary { background: #4285f4; border: none; }
+    .btn-primary:hover { background: #3367d6; }
+    .btn-success { background: #34a853; border: none; }
+    .btn-danger  { background: #ea4335; border: none; }
+    .btn-secondary { background: #6c757d; border: none; }
+    #pieChart { background: transparent !important; }
+    #listaSpese li, #archiveList li { margin-bottom: .5rem; }
+    .entry-buttons { margin-top: .5rem; }
   </style>
 </head>
 <body>
 
-  <h1>PAPI SPESE <span style="color:#ffc107">SUMMER 2025</span></h1>
-  <div class="container">
-    <div class="form-col">
-      <label for="giorno">Giorno</label>
-      <select id="giorno">
-        <option>Venerdì</option><option>Sabato</option><option>Domenica</option><option>Extra</option>
-      </select>
+<div class="container py-5">
+  <h1 class="text-center mb-5">
+    PAPI SPESE <span class="text-warning">SUMMER 2025</span>
+  </h1>
 
-      <label for="descrizione">Descrizione Serata</label>
-      <input id="descrizione" placeholder="Es: Opening, DJ Guest…" />
+  <div class="row">
+    <!-- FORM -->
+    <div class="col-md-6 mb-4">
+      <div class="card">
+        <h4>Spese Serata</h4>
+        <div class="mb-3">
+          <label class="form-label">Giorno</label>
+          <select id="giorno" class="form-select">
+            <option>Venerdì</option>
+            <option>Sabato</option>
+            <option>Serata Extra</option>
+          </select>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Descrizione Serata</label>
+          <input id="descSerata" class="form-control" placeholder="Es: Opening, DJ Guest…"/>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Data</label>
+          <input id="data" type="date" class="form-control" value="2025-04-30"/>
+        </div>
 
-      <label for="data">Data</label>
-      <input id="data" type="date" />
+        <hr class="border-secondary">
 
-      <hr style="border-color:#333; margin:1rem 0;">
+        <h5>Dettaglio Spese</h5>
+        <div class="mb-3">
+          <label class="form-label">Voce di spesa</label>
+          <input id="voce" class="form-control" placeholder="Es: DJ, PR…"/>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Importo</label>
+          <input id="importo" type="number" class="form-control" placeholder="0"/>
+        </div>
+        <button id="addSpesa" class="btn btn-primary w-100 mb-3">
+          Aggiungi Spesa
+        </button>
 
-      <label for="voce">Voce di spesa</label>
-      <input id="voce" placeholder="Es: DJ, PR…" />
+        <ul id="listaSpese" class="list-unstyled ps-3"></ul>
 
-      <label for="importo">Importo</label>
-      <input id="importo" type="number" min="0" value="0" />
-
-      <button id="btnAddSpesa" class="btn-add">Aggiungi Spesa</button>
-
-      <ul id="listaSpese"></ul>
-
-      <label for="pos">POS</label>
-      <input id="pos" type="number" min="0" value="0" />
-
-      <label for="contante">Contante</label>
-      <input id="contante" type="number" min="0" value="0" />
-
-      <p><strong>Totale Incasso: <span id="totaleIncasso">0.00</span> €</strong></p>
-
-      <button id="btnSaveArchivio" class="btn-save">Salva e Archivia Serata</button>
-      <button id="btnClearForm" class="btn-clear">Svuota Serata</button>
+        <div class="mb-3">
+          <label class="form-label">POS</label>
+          <input id="pos" type="number" class="form-control" value="0"/>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Contante</label>
+          <input id="contante" type="number" class="form-control" value="0"/>
+        </div>
+        <h5 id="totaleIncasso">Totale Incasso: €0.00</h5>
+        <button id="saveArchive" class="btn btn-success w-100">
+          Salva e Archivia Serata
+        </button>
+      </div>
     </div>
 
-    <div class="chart-col">
-      <h2>Composizione Incasso</h2>
-      <canvas id="pieChart"></canvas>
+    <!-- GRAFICO -->
+    <div class="col-md-6">
+      <div class="card h-100">
+        <h4>Composizione Incasso</h4>
+        <canvas id="pieChart"></canvas>
+        <button id="exportAll" class="btn btn-secondary mt-3 w-100">
+          Esporta Tutte in PDF
+        </button>
+      </div>
     </div>
   </div>
 
-  <div id="archivio" class="archive-list"></div>
+  <!-- ARCHIVIO -->
+  <div class="mt-5">
+    <h3>Archivio Serate</h3>
+    <ul id="archiveList" class="list-unstyled ps-3"></ul>
+  </div>
+</div>
 
-  <script>
-    // elementi
-    const giornoEl = document.getElementById('giorno');
-    const descEl   = document.getElementById('descrizione');
-    const dataEl   = document.getElementById('data');
-    const voceEl   = document.getElementById('voce');
-    const impEl    = document.getElementById('importo');
-    const posEl    = document.getElementById('pos');
-    const contEl   = document.getElementById('contante');
-    const listaSpeseEl = document.getElementById('listaSpese');
-    const totIncEl = document.getElementById('totaleIncasso');
-    const btnAddSpesa    = document.getElementById('btnAddSpesa');
-    const btnSaveArchivio= document.getElementById('btnSaveArchivio');
-    const btnClearForm   = document.getElementById('btnClearForm');
-    const archivioEl     = document.getElementById('archivio');
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  // ELEMENTI
+  const giornoEl    = document.getElementById('giorno'),
+        descEl      = document.getElementById('descSerata'),
+        dataEl      = document.getElementById('data'),
+        voceEl      = document.getElementById('voce'),
+        importoEl   = document.getElementById('importo'),
+        addSpesaBtn = document.getElementById('addSpesa'),
+        listaSpese  = document.getElementById('listaSpese'),
+        posEl       = document.getElementById('pos'),
+        contEl      = document.getElementById('contante'),
+        totaleInc   = document.getElementById('totaleIncasso'),
+        saveBtn     = document.getElementById('saveArchive'),
+        archiveList = document.getElementById('archiveList'),
+        exportAll   = document.getElementById('exportAll');
 
-    let spese = [], pieChart;
+  let spese = [], chart;
 
-    // init data
-    if (!dataEl.value) {
-      dataEl.value = new Date().toISOString().slice(0,10);
-    }
+  // inizializza grafico
+  function initChart() {
+    chart = new Chart(document.getElementById('pieChart'), {
+      type: 'pie',
+      data: {
+        labels: ['POS','Contante','Spese'],
+        datasets: [{ 
+          data: [0,0,0], 
+          backgroundColor: ['#4DB6AC','#64B5F6','#EF5350']
+        }]
+      },
+      options: { plugins:{ legend:{ labels:{ color:'#fff' } } } }
+    });
+  }
 
-    // crea grafico
-    function initChart(){
-      const ctx = document.getElementById('pieChart').getContext('2d');
-      pieChart = new Chart(ctx,{
-        type:'pie',
-        data:{
-          labels:['POS','Contante','Spese'],
-          datasets:[{
-            data:[0,0,0],
-            backgroundColor:['#4db6ac','#42a5f5','#ef5350']
-          }]
-        },
-        options:{ plugins:{ legend:{ labels:{ color:'#fff' } } } }
-      });
-    }
-
-    // aggiorna grafico + totale incasso
-    function updateChart(){
-      const totSpese = spese.reduce((sum,e)=>sum+e.importo,0);
-      const pos = +posEl.value || 0;
-      const cont = +contEl.value || 0;
-      pieChart.data.datasets[0].data = [pos,cont,totSpese];
-      pieChart.update();
-      totIncEl.textContent = (pos+cont+totSpese).toFixed(2);
-    }
-
-    // aggiunge spesa
-    btnAddSpesa.onclick = ()=>{
-      const v=voceEl.value.trim(), i=+impEl.value||0;
-      if(!v||i<=0) return;
-      spese.push({ voce:v, importo:i });
+  // render spese
+  function renderSpese() {
+    listaSpese.innerHTML = '';
+    spese.forEach(s => {
       const li = document.createElement('li');
-      li.textContent = `${v}: €${i.toFixed(2)}`;
-      listaSpeseEl.append(li);
-      voceEl.value=''; impEl.value=0;
-      updateChart();
-    };
+      li.textContent = `${s.voce}: €${s.importo.toFixed(2)}`;
+      listaSpese.appendChild(li);
+    });
+  }
 
-    // salva su localStorage e ricarica
-    btnSaveArchivio.onclick = ()=>{
-      const serata = {
-        giorno:giornoEl.value,
-        descr:descEl.value.trim(),
-        data:dataEl.value,
-        spese:[...spese],
-        pos:+posEl.value||0,
-        cont:+contEl.value||0,
-        totale:+totIncEl.textContent||0
-      };
-      const arch = JSON.parse(localStorage.getItem('archivio')||'[]');
-      arch.push(serata);
-      localStorage.setItem('archivio', JSON.stringify(arch));
-      alert('Serata archiviata!');
-      caricaArchivio();
-      btnClearForm.click();
-    };
+  // aggiorna grafico e totale (ora **somma** spese + pos + contante)
+  function updateEverything() {
+    const pos    = parseFloat(posEl.value)||0;
+    const cont   = parseFloat(contEl.value)||0;
+    const sumSp  = spese.reduce((a,b)=>a+b.importo,0);
+    const inc    = pos + cont + sumSp;   // <-- qui uso la somma, non la sottrazione
+    totaleInc.textContent = `Totale Incasso: €${inc.toFixed(2)}`;
+    chart.data.datasets[0].data = [pos, cont, sumSp];
+    chart.update();
+  }
 
-    // svuota form
-    btnClearForm.onclick = ()=>{
-      spese=[]; listaSpeseEl.innerHTML=''; posEl.value=0; contEl.value=0;
-      totIncEl.textContent='0.00'; descEl.value='';
-      updateChart();
-    };
+  // aggiungi spesa
+  addSpesaBtn.onclick = ()=>{
+    const v = voceEl.value.trim(),
+          imp = parseFloat(importoEl.value);
+    if(!v||isNaN(imp)||imp<=0) return alert('Inserisci voce e importo validi');
+    spese.push({ voce:v, importo:imp });
+    voceEl.value=''; importoEl.value='';
+    renderSpese(); updateEverything();
+  };
 
-    // elimina card
-    function deleteSerata(idx){
-      const arch = JSON.parse(localStorage.getItem('archivio')||'[]');
-      arch.splice(idx,1);
-      localStorage.setItem('archivio', JSON.stringify(arch));
-      caricaArchivio();
-    }
+  // listener POS e Contante
+  posEl.addEventListener('input', updateEverything);
+  contEl.addEventListener('input', updateEverything);
 
-    // esporta in PDF
-    function exportPDF(cardEl, name){
-      html2pdf().set({ margin:10, filename:name })
-        .from(cardEl).save();
-    }
+  // salva in archivio
+  saveBtn.onclick = ()=>{
+    const archivio = JSON.parse(localStorage.getItem('archivioSpese')||'[]');
+    archivio.push({
+      giorno: giornoEl.value,
+      descrizione: descEl.value.trim(),
+      data: dataEl.value,
+      spese: [...spese],
+      pos: parseFloat(posEl.value)||0,
+      contante: parseFloat(contEl.value)||0,
+      incasso: parseFloat((parseFloat(posEl.value)||0) + (parseFloat(contEl.value)||0) + spese.reduce((a,b)=>a+b.importo,0))
+    });
+    localStorage.setItem('archivioSpese', JSON.stringify(archivio));
+    alert('Serata archiviata!');
+    // reset form
+    spese=[]; renderSpese();
+    descEl.value=''; posEl.value='0'; contEl.value='0';
+    updateEverything(); renderArchivio();
+  };
 
-    // costruisce archivio
-    function caricaArchivio(){
-      archivioEl.innerHTML = '<h2>Archivio Serate</h2>';
-      JSON.parse(localStorage.getItem('archivio')||'[]')
-        .forEach((s,i)=>{
-          const card=document.createElement('div');
-          card.className='card';
-          card.innerHTML=`
-            <div class="card-header">
-              <strong>${s.data} – ${s.descr||s.giorno}</strong>
-              <span>
-                <button class="btn-archive-delete" data-idx="${i}">✖</button>
-                <button class="btn-archive-pdf" data-idx="${i}">📄</button>
-              </span>
-            </div>
-            <ul>${s.spese.map(e=>`<li>${e.voce}: €${e.importo.toFixed(2)}</li>`).join('')}</ul>
-            <p>POS: €${s.pos.toFixed(2)}, Contante: €${s.cont.toFixed(2)}</p>
-            <p><strong>Totale: €${s.totale.toFixed(2)}</strong></p>
-          `;
-          archivioEl.append(card);
-          card.querySelector('.btn-archive-delete')
-              .addEventListener('click', ()=> deleteSerata(i));
-          card.querySelector('.btn-archive-pdf')
-              .addEventListener('click', ()=> exportPDF(card, `serata-${s.data}.pdf`));
-        });
-    }
+  // render archivio con export/elimina
+  function renderArchivio() {
+    archiveList.innerHTML = '';
+    JSON.parse(localStorage.getItem('archivioSpese')||'[]')
+      .forEach((e,i)=>{
+        const li = document.createElement('li');
+        li.innerHTML = `
+          <strong>${e.data} – ${e.descrizione}</strong><br>
+          Spese: ${e.spese.map(s=>`${s.voce} €${s.importo.toFixed(2)}`).join(', ')}<br>
+          POS: €${e.pos.toFixed(2)}, Contante: €${e.contante.toFixed(2)}, 
+          <em>Incasso: €${e.incasso.toFixed(2)}</em>
+          <div class="entry-buttons">
+            <button class="btn btn-sm btn-secondary me-2" onclick="exportEntry(${i})">Esporta PDF</button>
+            <button class="btn btn-sm btn-danger" onclick="deleteEntry(${i})">Elimina</button>
+          </div>`;
+        archiveList.appendChild(li);
+      });
+  }
 
-    posEl.oninput = updateChart;
-    contEl.oninput = updateChart;
+  // elimina
+  function deleteEntry(idx) {
+    const a = JSON.parse(localStorage.getItem('archivioSpese')||'[]');
+    a.splice(idx,1);
+    localStorage.setItem('archivioSpese', JSON.stringify(a));
+    renderArchivio();
+  }
 
-    window.onload = ()=>{
-      initChart();
-      updateChart();
-      caricaArchivio();
-    };
-  </script>
+  // esporta singola
+  function exportEntry(i) {
+    const e = JSON.parse(localStorage.getItem('archivioSpese'))[i];
+    const w = window.open('','_blank');
+    w.document.write(`
+      <h1>${e.data} – ${e.descrizione}</h1>
+      <p>POS: €${e.pos.toFixed(2)}, Contante: €${e.contante.toFixed(2)}</p>
+      <p>Spese:</p><ul>${e.spese.map(s=>`<li>${s.voce}: €${s.importo.toFixed(2)}</li>`).join('')}</ul>
+      <h3>Incasso: €${e.incasso.toFixed(2)}</h3>`);
+    w.document.close(); w.focus(); w.print(); w.close();
+  }
+
+  // esporta tutte
+  exportAll.onclick = ()=>window.print();
+
+  // avvio
+  initChart();
+  updateEverything();
+  renderArchivio();
+</script>
 </body>
 </html>
