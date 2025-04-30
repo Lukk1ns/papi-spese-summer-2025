@@ -1,43 +1,43 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>PAPI SPESE SUMMER 2025</title>
-  <link rel="icon" type="image/x-icon" href="favicon.ico" />
-  <link rel="stylesheet" href="style.css" />
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PAPI SPESE SUMMER 2025</title>
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link href="style.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-  <div class="container">
-    <h1>SUMMER 2025</h1>
-    <div class="form-section">
-      <input type="text" id="giorno" placeholder="Giorno" />
-      <input type="text" id="descrizione" placeholder="Descrizione Serata" />
-      <input type="date" id="data" />
-      <input type="text" id="voce" placeholder="Voce" />
-      <input type="number" id="importo" placeholder="Importo" />
-      <button id="aggiungiSpesa" class="btn blue">Aggiungi Spesa</button>
-      <ul id="lista-spese"></ul>
-      <input type="number" id="pos" placeholder="POS" />
-      <input type="number" id="contante" placeholder="Contante" />
-      <div id="totale">0 €</div>
-      <button id="salva" class="btn green">Salva e Archivia Serata</button>
+    <div class="container">
+        <h1><span class="white">PAPI SPESE</span> <span class="highlight">SUMMER 2025</span></h1>
+        <div class="grid">
+            <div class="left">
+                <label>Giorno</label>
+                <input id="giorno" type="text" placeholder="Venerdì">
+                <label>Descrizione Serata</label>
+                <input id="descrizione" type="text" placeholder="Es: Opening, DJ Guest, ecc.">
+                <label>Data</label>
+                <input id="data" type="date">
+                <label>Voce</label>
+                <input id="voce" type="text">
+                <label>Importo</label>
+                <input id="importo" type="number">
+                <button onclick="aggiungiSpesa()">Aggiungi Spesa</button>
+                <ul id="lista-spese"></ul>
+                <label>POS</label>
+                <input id="pos" type="number" value="0">
+                <label>Contante</label>
+                <input id="contante" type="number" value="0">
+                <p class="totale">Totale Incasso: <span id="totale">0 €</span></p>
+                <button class="green" onclick="salvaSerata()">Salva e Archivia Serata</button>
+            </div>
+            <div class="right">
+                <h3>Composizione Incasso</h3>
+                <canvas id="grafico"></canvas>
+            </div>
+        </div>
     </div>
-    <div class="grafico-section">
-      <canvas id="grafico"></canvas>
-    </div>
-    <div class="archivio-section">
-      <h2>Archivio Serate</h2>
-      <table id="archivio">
-        <thead>
-          <tr><th>Totale</th><th>Azioni</th></tr>
-        </thead>
-        <tbody></tbody>
-      </table>
-      <button id="esportaTutti" class="btn gray">Esporta Tutti in PDF</button>
-    </div>
-  </div>
-  <script src="app.js"></script>
+    <script src="app.js"></script>
 </body>
 </html>
