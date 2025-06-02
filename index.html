@@ -1,699 +1,263 @@
+
 <!DOCTYPE html>
 <html lang="it">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PAPI GESTIONE SERATE 🎉</title>
-    
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    
-    <style>
-        :root {
-            --primary: #ff006e;
-            --secondary: #3a0ca3;
-            --success: #06ffa5;
-            --danger: #ff4365;
-            --warning: #ffb700;
-            --dark: #0a0a0a;
-            --light: #f8f9fa;
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>PAPI SPESE SUMMER 2025</title>
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+  <!-- Bootstrap CSS -->
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+  />
 
-        body {
-            background: linear-gradient(135deg, #0a0a0a 0%, #1a0033 100%);
-            color: #fff;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            min-height: 100vh;
-        }
-
-        .navbar {
-            background: rgba(0,0,0,0.9) !important;
-            backdrop-filter: blur(10px);
-            box-shadow: 0 4px 20px rgba(255, 0, 110, 0.3);
-        }
-
-        .navbar-brand {
-            font-size: 1.5rem;
-            font-weight: bold;
-            background: linear-gradient(45deg, var(--primary), var(--warning));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .nav-tabs {
-            border-bottom: 2px solid var(--primary);
-            margin-bottom: 2rem;
-        }
-
-        .nav-tabs .nav-link {
-            color: #fff;
-            border: none;
-            padding: 1rem 2rem;
-            margin-right: 1rem;
-            background: rgba(255,255,255,0.05);
-            border-radius: 10px 10px 0 0;
-            transition: all 0.3s ease;
-        }
-
-        .nav-tabs .nav-link:hover {
-            background: rgba(255,255,255,0.1);
-            transform: translateY(-2px);
-        }
-
-        .nav-tabs .nav-link.active {
-            background: var(--primary);
-            color: #fff;
-            box-shadow: 0 -5px 20px rgba(255, 0, 110, 0.5);
-        }
-
-        .card {
-            background: rgba(255,255,255,0.05);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 20px;
-            padding: 2rem;
-            margin-bottom: 2rem;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
-            transition: all 0.3s ease;
-        }
-
-        .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 12px 40px rgba(255, 0, 110, 0.2);
-        }
-
-        .form-control, .form-select {
-            background: rgba(255,255,255,0.1);
-            border: 1px solid rgba(255,255,255,0.2);
-            color: #fff;
-            padding: 0.75rem 1rem;
-            border-radius: 10px;
-            transition: all 0.3s ease;
-        }
-
-        .form-control:focus, .form-select:focus {
-            background: rgba(255,255,255,0.15);
-            border-color: var(--primary);
-            box-shadow: 0 0 0 0.2rem rgba(255, 0, 110, 0.25);
-            color: #fff;
-        }
-
-        .form-control::placeholder {
-            color: rgba(255,255,255,0.5);
-        }
-
-        .form-select option {
-            background: var(--dark);
-            color: #fff;
-        }
-
-        .btn {
-            padding: 0.75rem 1.5rem;
-            border-radius: 10px;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            border: none;
-        }
-
-        .btn-primary {
-            background: linear-gradient(45deg, var(--primary), var(--secondary));
-            box-shadow: 0 4px 15px rgba(255, 0, 110, 0.4);
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(255, 0, 110, 0.6);
-        }
-
-        .btn-success {
-            background: linear-gradient(45deg, var(--success), #00d084);
-            box-shadow: 0 4px 15px rgba(6, 255, 165, 0.4);
-        }
-
-        .btn-danger {
-            background: linear-gradient(45deg, var(--danger), #e91e63);
-            box-shadow: 0 4px 15px rgba(255, 67, 101, 0.4);
-        }
-
-        .btn-warning {
-            background: linear-gradient(45deg, var(--warning), #ff6b00);
-            box-shadow: 0 4px 15px rgba(255, 183, 0, 0.4);
-        }
-
-        .spesa-item {
-            background: rgba(255,255,255,0.05);
-            padding: 1rem;
-            border-radius: 10px;
-            margin-bottom: 0.5rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            transition: all 0.3s ease;
-        }
-
-        .spesa-item:hover {
-            background: rgba(255,255,255,0.1);
-            transform: translateX(5px);
-        }
-
-        .totale-box {
-            background: linear-gradient(135deg, rgba(255,0,110,0.2), rgba(58,12,163,0.2));
-            border: 2px solid var(--primary);
-            border-radius: 15px;
-            padding: 1.5rem;
-            text-align: center;
-            margin-top: 1rem;
-        }
-
-        .totale-box h3 {
-            margin: 0;
-            font-size: 2rem;
-            background: linear-gradient(45deg, var(--primary), var(--warning));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .profit-indicator {
-            font-size: 1.5rem;
-            font-weight: bold;
-            padding: 1rem;
-            border-radius: 10px;
-            text-align: center;
-            margin-top: 1rem;
-        }
-
-        .profit-indicator.profit {
-            background: rgba(6, 255, 165, 0.2);
-            color: var(--success);
-            border: 2px solid var(--success);
-        }
-
-        .profit-indicator.loss {
-            background: rgba(255, 67, 101, 0.2);
-            color: var(--danger);
-            border: 2px solid var(--danger);
-        }
-
-        .archived-event {
-            background: rgba(255,255,255,0.05);
-            padding: 1.5rem;
-            border-radius: 15px;
-            margin-bottom: 1rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            border: 1px solid rgba(255,255,255,0.1);
-        }
-
-        .archived-event:hover {
-            background: rgba(255,255,255,0.1);
-            transform: translateY(-3px);
-            box-shadow: 0 5px 20px rgba(255, 0, 110, 0.3);
-        }
-
-        .stat-card {
-            background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
-            border-radius: 15px;
-            padding: 1.5rem;
-            text-align: center;
-            margin-bottom: 1rem;
-            border: 1px solid rgba(255,255,255,0.2);
-        }
-
-        .stat-card h4 {
-            color: var(--warning);
-            margin-bottom: 0.5rem;
-        }
-
-        .stat-card .value {
-            font-size: 2rem;
-            font-weight: bold;
-            background: linear-gradient(45deg, var(--primary), var(--warning));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .chart-container {
-            background: rgba(255,255,255,0.05);
-            border-radius: 15px;
-            padding: 1.5rem;
-            margin-bottom: 2rem;
-        }
-
-        #personaleInputs .row {
-            margin-bottom: 1rem;
-        }
-
-        .alert {
-            border-radius: 10px;
-            border: none;
-        }
-
-        .modal-content {
-            background: var(--dark);
-            border: 1px solid rgba(255,255,255,0.2);
-            border-radius: 20px;
-        }
-
-        .modal-header {
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-        }
-
-        .modal-footer {
-            border-top: 1px solid rgba(255,255,255,0.1);
-        }
-
-        @media (max-width: 768px) {
-            .nav-tabs .nav-link {
-                padding: 0.75rem 1rem;
-                font-size: 0.9rem;
-            }
-            
-            .card {
-                padding: 1.5rem;
-            }
-        }
-
-        .quick-stats {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
-            margin-bottom: 2rem;
-        }
-
-        .cost-breakdown {
-            background: rgba(255,255,255,0.05);
-            border-radius: 10px;
-            padding: 1rem;
-            margin-top: 1rem;
-        }
-
-        .cost-breakdown-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 0.5rem 0;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-        }
-
-        .cost-breakdown-item:last-child {
-            border-bottom: none;
-            font-weight: bold;
-            color: var(--warning);
-            font-size: 1.1rem;
-            margin-top: 0.5rem;
-            padding-top: 1rem;
-            border-top: 2px solid rgba(255,255,255,0.2);
-        }
-    </style>
+  <style> #listaSpese li {
+  color: #ff4f4f !important;
+}
+    body {
+      background: #111;
+      color: #fff;
+      font-family: 'Segoe UI', sans-serif;
+    }
+    h1,h2,h3,h4,h5,h6,label,
+    .form-label, .btn, #archiveList, #archiveList * {
+      color: #fff !important;
+    }
+    ::placeholder { color: #ccc !important; opacity:1; }
+    .card {
+      background: #1e1e1e;
+      border: none;
+      border-radius: 1rem;
+      box-shadow: 0 0 12px rgba(255,255,255,0.05);
+      padding: 1rem;
+    }
+    .btn-primary { background: #4285f4; border: none; }
+    .btn-primary:hover { background: #3367d6; }
+    .btn-success { background: #34a853; border: none; }
+    .btn-danger  { background: #ea4335; border: none; }
+    .btn-secondary { background: #6c757d; border: none; }
+    #pieChart { background: transparent !important; }
+    #listaSpese li, #archiveList li { margin-bottom: .5rem; }
+    .entry-buttons { margin-top: .5rem; }
+  </style>
 </head>
 <body>
 
-<nav class="navbar navbar-dark">
-    <div class="container-fluid">
-        <span class="navbar-brand">🎉 PAPI GESTIONE SERATE 🎉</span>
-        <span class="text-light">Summer 2025</span>
+<div class="container py-5">
+  <h1 class="text-center mb-5">
+    PAPI SPESE <span class="text-warning">SUMMER 2025</span>
+  </h1>
+
+  <div class="row">
+    <!-- FORM -->
+    <div class="col-md-6 mb-4">
+      <div class="card">
+        <h4>Spese Serata</h4>
+        <div class="mb-3">
+          <label class="form-label">Giorno</label>
+          <select id="giorno" class="form-select">
+            <option>Venerdì</option>
+            <option>Sabato</option>
+            <option>Serata Extra</option>
+          </select>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Descrizione Serata</label>
+          <input id="descSerata" class="form-control" placeholder="Es: Opening, DJ Guest…"/>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Data</label>
+          <input id="data" type="date" class="form-control" value="2025-04-30"/>
+        </div>
+
+        <hr class="border-secondary">
+
+        <h5>Dettaglio Spese</h5>
+        <div class="mb-3">
+          <label class="form-label">Voce di spesa</label>
+          <input id="voce" class="form-control" placeholder="Es: DJ, PR…"/>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Importo</label>
+          <input id="importo" type="number" class="form-control" placeholder="0"/>
+        </div>
+        <button id="addSpesa" class="btn btn-primary w-100 mb-3">
+          Aggiungi Spesa
+        </button>
+
+        <ul id="listaSpese" class="list-unstyled ps-3"></ul>
+
+        <div class="mb-3">
+          <label class="form-label">POS</label>
+          <input id="pos" type="number" class="form-control" value="0"/>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Contante</label>
+          <input id="contante" type="number" class="form-control" value="0"/>
+        </div>
+        <h5 id="totaleIncasso">Totale Incasso: €0.00</h5>
+        <button id="saveArchive" class="btn btn-success w-100">
+          Salva e Archivia Serata
+        </button>
+      </div>
     </div>
-</nav>
 
-<div class="container-fluid py-4">
-    <!-- Nav tabs -->
-    <ul class="nav nav-tabs" id="mainTabs" role="tablist">
-        <li class="nav-item" role="presentation">
-            <button class="nav-link active" id="incassi-tab" data-bs-toggle="tab" data-bs-target="#incassi" type="button">
-                💰 Incassi Serata
-            </button>
-        </li>
-        <li class="nav-item" role="presentation">
-            <button class="nav-link" id="costi-tab" data-bs-toggle="tab" data-bs-target="#costi" type="button">
-                📊 Costi & Personale
-            </button>
-        </li>
-        <li class="nav-item" role="presentation">
-            <button class="nav-link" id="archivio-tab" data-bs-toggle="tab" data-bs-target="#archivio" type="button">
-                📁 Archivio
-            </button>
-        </li>
-        <li class="nav-item" role="presentation">
-            <button class="nav-link" id="statistiche-tab" data-bs-toggle="tab" data-bs-target="#statistiche" type="button">
-                📈 Statistiche
-            </button>
-        </li>
-    </ul>
-
-    <!-- Tab content -->
-    <div class="tab-content" id="mainTabsContent">
-        <!-- INCASSI TAB -->
-        <div class="tab-pane fade show active" id="incassi" role="tabpanel">
-            <div class="row">
-                <div class="col-lg-6">
-                    <div class="card">
-                        <h4 class="mb-4">📝 Dettagli Serata</h4>
-                        <div class="mb-3">
-                            <label class="form-label">Tipo Serata</label>
-                            <select id="giorno" class="form-select">
-                                <option>Venerdì</option>
-                                <option>Sabato</option>
-                                <option>Serata Extra</option>
-                                <option>Evento Speciale</option>
-                            </select>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Descrizione Evento</label>
-                            <input id="descSerata" class="form-control" placeholder="Es: Opening Summer, DJ Internazionale...">
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Data</label>
-                            <input id="data" type="date" class="form-control">
-                        </div>
-                    </div>
-
-                    <div class="card">
-                        <h4 class="mb-4">💸 Spese in Serata</h4>
-                        <div class="row mb-3">
-                            <div class="col-8">
-                                <input id="voceSpesa" class="form-control" placeholder="Voce di spesa (DJ, PR, etc.)">
-                            </div>
-                            <div class="col-4">
-                                <input id="importoSpesa" type="number" class="form-control" placeholder="€">
-                            </div>
-                        </div>
-                        <button id="addSpesa" class="btn btn-primary w-100 mb-3">
-                            ➕ Aggiungi Spesa
-                        </button>
-                        <div id="listaSpese"></div>
-                        <div class="totale-box">
-                            <small>Totale Spese</small>
-                            <h3 id="totaleSpese">€0.00</h3>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-lg-6">
-                    <div class="card">
-                        <h4 class="mb-4">💳 Incassi</h4>
-                        <div class="mb-3">
-                            <label class="form-label">POS</label>
-                            <input id="pos" type="number" class="form-control" placeholder="0">
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Contante</label>
-                            <input id="contante" type="number" class="form-control" placeholder="0">
-                        </div>
-                        <div class="totale-box">
-                            <small>Incasso Totale</small>
-                            <h3 id="totaleIncasso">€0.00</h3>
-                        </div>
-                    </div>
-
-                    <div class="card">
-                        <h4 class="mb-4">📊 Composizione Incasso</h4>
-                        <div class="chart-container">
-                            <canvas id="incassoChart"></canvas>
-                        </div>
-                    </div>
-
-                    <button id="procediCosti" class="btn btn-success btn-lg w-100">
-                        Procedi ai Costi →
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <!-- COSTI TAB -->
-        <div class="tab-pane fade" id="costi" role="tabpanel">
-            <div class="row">
-                <div class="col-lg-6">
-                    <div class="card">
-                        <h4 class="mb-4">👥 Personale</h4>
-                        <div id="personaleInputs">
-                            <div class="row">
-                                <div class="col-6">
-                                    <label class="form-label">Baristi (€110/cad)</label>
-                                    <input type="number" class="form-control personale-input" data-role="baristi" data-cost="110" placeholder="0">
-                                </div>
-                                <div class="col-6">
-                                    <label class="form-label">Camerieri (€100/cad)</label>
-                                    <input type="number" class="form-control personale-input" data-role="camerieri" data-cost="100" placeholder="0">
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-6">
-                                    <label class="form-label">Sicurezza (€130/cad)</label>
-                                    <input type="number" class="form-control personale-input" data-role="sicurezza" data-cost="130" placeholder="0">
-                                </div>
-                                <div class="col-6">
-                                    <label class="form-label">Paninaro (€/cad)</label>
-                                    <div class="input-group">
-                                        <input type="number" class="form-control personale-input" data-role="paninaro" placeholder="0">
-                                        <input type="number" class="form-control" id="paninaro-cost" placeholder="€" style="max-width: 80px;">
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-6">
-                                    <label class="form-label">Cassa (€/cad)</label>
-                                    <div class="input-group">
-                                        <input type="number" class="form-control personale-input" data-role="cassa" placeholder="0">
-                                        <input type="number" class="form-control" id="cassa-cost" placeholder="€" style="max-width: 80px;">
-                                    </div>
-                                </div>
-                                <div class="col-6">
-                                    <label class="form-label">Fotografo</label>
-                                    <input type="number" class="form-control" id="fotografo" placeholder="€ totale">
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-6">
-                                    <label class="form-label">Artistico</label>
-                                    <input type="number" class="form-control" id="artistico" placeholder="€ totale">
-                                </div>
-                                <div class="col-6">
-                                    <label class="form-label">Ambulanza</label>
-                                    <input type="number" class="form-control" id="ambulanza" placeholder="€ totale">
-                                </div>
-                            </div>
-                        </div>
-
-                        <hr class="my-4">
-
-                        <h5 class="mb-3">➕ Spese Extra</h5>
-                        <div class="row mb-3">
-                            <div class="col-8">
-                                <input id="extraDesc" class="form-control" placeholder="Descrizione">
-                            </div>
-                            <div class="col-4">
-                                <input id="extraImporto" type="number" class="form-control" placeholder="€">
-                            </div>
-                        </div>
-                        <button id="addExtra" class="btn btn-warning btn-sm w-100 mb-3">
-                            Aggiungi Spesa Extra
-                        </button>
-                        <div id="listaExtra"></div>
-                    </div>
-                </div>
-
-                <div class="col-lg-6">
-                    <div class="card">
-                        <h4 class="mb-4">🧮 Altri Costi</h4>
-                        <div class="alert alert-info">
-                            <strong>Spese Fisse:</strong> €4,050.00
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Materia Prima (% su incasso)</label>
-                            <div class="input-group">
-                                <input id="materiaPrima" type="number" class="form-control" placeholder="30" value="30">
-                                <span class="input-group-text">%</span>
-                            </div>
-                            <small class="text-muted">Calcolato su incasso: <span id="materiaPrimaCalc">€0.00</span></small>
-                        </div>
-                    </div>
-
-                    <div class="card">
-                        <h4 class="mb-4">💰 Riepilogo Economico</h4>
-                        <div class="cost-breakdown">
-                            <div class="cost-breakdown-item">
-                                <span>Incasso Totale</span>
-                                <span id="riepilogoIncasso">€0.00</span>
-                            </div>
-                            <div class="cost-breakdown-item">
-                                <span>Spese in Serata</span>
-                                <span id="riepilogoSpeseSerata">€0.00</span>
-                            </div>
-                            <div class="cost-breakdown-item">
-                                <span>Costo Personale</span>
-                                <span id="riepilogoPersonale">€0.00</span>
-                            </div>
-                            <div class="cost-breakdown-item">
-                                <span>Spese Fisse</span>
-                                <span>€4,050.00</span>
-                            </div>
-                            <div class="cost-breakdown-item">
-                                <span>Materia Prima</span>
-                                <span id="riepilogoMateria">€0.00</span>
-                            </div>
-                            <div class="cost-breakdown-item">
-                                <span>Spese Extra</span>
-                                <span id="riepilogoExtra">€0.00</span>
-                            </div>
-                            <div class="cost-breakdown-item">
-                                <span>TOTALE COSTI</span>
-                                <span id="riepilogoCosti">€0.00</span>
-                            </div>
-                        </div>
-                        
-                        <div class="profit-indicator" id="profitIndicator">
-                            <div id="profitText">Calcolo in corso...</div>
-                            <div id="profitAmount" style="font-size: 2rem;"></div>
-                        </div>
-
-                        <button id="salvaSerata" class="btn btn-primary btn-lg w-100 mt-3">
-                            💾 Salva Serata
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- ARCHIVIO TAB -->
-        <div class="tab-pane fade" id="archivio" role="tabpanel">
-            <div class="row mb-3">
-                <div class="col-md-6">
-                    <input type="text" id="searchArchivio" class="form-control" placeholder="🔍 Cerca per data o descrizione...">
-                </div>
-                <div class="col-md-6">
-                    <select id="filterArchivio" class="form-select">
-                        <option value="all">Tutte le serate</option>
-                        <option value="profit">Solo in profitto</option>
-                        <option value="loss">Solo in perdita</option>
-                    </select>
-                </div>
-            </div>
-            <div id="archivioList"></div>
-        </div>
-
-        <!-- STATISTICHE TAB -->
-        <div class="tab-pane fade" id="statistiche" role="tabpanel">
-            <div class="quick-stats" id="quickStats">
-                <div class="stat-card">
-                    <h4>Serate Totali</h4>
-                    <div class="value" id="statTotali">0</div>
-                </div>
-                <div class="stat-card">
-                    <h4>Incasso Totale</h4>
-                    <div class="value" id="statIncasso">€0</div>
-                </div>
-                <div class="stat-card">
-                    <h4>Profitto Totale</h4>
-                    <div class="value" id="statProfitto">€0</div>
-                </div>
-                <div class="stat-card">
-                    <h4>Media per Serata</h4>
-                    <div class="value" id="statMedia">€0</div>
-                </div>
-            </div>
-
-            <div class="row">
-                <div class="col-lg-6">
-                    <div class="card">
-                        <h4>📊 Andamento Mensile</h4>
-                        <div class="chart-container">
-                            <canvas id="trendChart"></canvas>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-6">
-                    <div class="card">
-                        <h4>🍕 Distribuzione Costi</h4>
-                        <div class="chart-container">
-                            <canvas id="costiChart"></canvas>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="card mt-4">
-                <h4 class="mb-3">📈 Top Performers</h4>
-                <div id="topPerformers"></div>
-            </div>
-
-            <button class="btn btn-warning btn-lg w-100 mt-3" onclick="exportAllData()">
-                📄 Esporta Report Completo PDF
-            </button>
-        </div>
+    <!-- GRAFICO -->
+    <div class="col-md-6">
+      <div class="card h-100">
+        <h4>Composizione Incasso</h4>
+        <canvas id="pieChart"></canvas>
+        <button id="exportAll" class="btn btn-secondary mt-3 w-100">
+          Esporta Tutte in PDF
+        </button>
+      </div>
     </div>
+  </div>
+
+  <!-- ARCHIVIO -->
+  <div class="mt-5">
+    <h3>Archivio Serate</h3>
+    <ul id="archiveList" class="list-unstyled ps-3"></ul>
+  </div>
 </div>
 
-<!-- Modal dettaglio serata -->
-<div class="modal fade" id="detailModal" tabindex="-1">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Dettaglio Serata</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body" id="modalBody">
-                <!-- Contenuto dinamico -->
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Chiudi</button>
-                <button type="button" class="btn btn-primary" onclick="exportSinglePDF()">Esporta PDF</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Bootstrap JS -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <!-- Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<!-- html2pdf -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-
 <script>
-// Stato globale
-let currentSerata = {
-    // Info base
-    tipo: '',
-    descrizione: '',
-    data: '',
-    // Incassi
-    pos: 0,
-    contante: 0,
-    speseSerata: [],
-    // Costi
-    personale: {},
-    speseExtra: [],
-    materiaPrimaPerc: 30,
-    // Calcolati
-    incassoTotale: 0,
-    costoTotale: 0,
-    profitto: 0
-};
+  // ELEMENTI
+  const giornoEl    = document.getElementById('giorno'),
+        descEl      = document.getElementById('descSerata'),
+        dataEl      = document.getElementById('data'),
+        voceEl      = document.getElementById('voce'),
+        importoEl   = document.getElementById('importo'),
+        addSpesaBtn = document.getElementById('addSpesa'),
+        listaSpese  = document.getElementById('listaSpese'),
+        posEl       = document.getElementById('pos'),
+        contEl      = document.getElementById('contante'),
+        totaleInc   = document.getElementById('totaleIncasso'),
+        saveBtn     = document.getElementById('saveArchive'),
+        archiveList = document.getElementById('archiveList'),
+        exportAll   = document.getElementById('exportAll');
 
-// Charts
-let incassoChart, trendChart, costiChart;
+  let spese = [], chart;
 
-// Inizializzazione
-document.addEventListener('DOMContentLoaded', function() {
-    // Set data odierna
-    document.getElementById('data').valueAsDate = new Date();
-    
-    // Inizializza charts
-    initCharts();
-    
-    // Event listeners
-    setupEventListeners();
-    
-    // Carica archivio
-    loadArchivio();
-    updateStatistiche();
-});
+  // inizializza grafico
+  function initChart() {
+    chart = new Chart(document.getElementById('pieChart'), {
+      type: 'pie',
+      data: {
+        labels: ['POS','Contante','Spese'],
+        datasets: [{ 
+          data: [0,0,0], 
+          backgroundColor: ['#4DB6AC','#64B5F6','#EF5350']
+        }]
+      },
+      options: { plugins:{ legend:{ labels:{ color:'#fff' } } } }
+    });
+  }
 
-function initCharts() {
-    // Grafico incasso
-    const ctxIncasso = document.getElementById('
+  // render spese
+  function renderSpese() {
+    listaSpese.innerHTML = '';
+    spese.forEach(s => {
+      const li = document.createElement('li');
+      li.textContent = `${s.voce}: €${s.importo.toFixed(2)}`;
+      listaSpese.appendChild(li);
+    });
+  }
+
+  // aggiorna grafico e totale (ora **somma** spese + pos + contante)
+  function updateEverything() {
+    const pos    = parseFloat(posEl.value)||0;
+    const cont   = parseFloat(contEl.value)||0;
+    const sumSp  = spese.reduce((a,b)=>a+b.importo,0);
+    const inc    = pos + cont + sumSp;   // <-- qui uso la somma, non la sottrazione
+    totaleInc.textContent = `Totale Incasso: €${inc.toFixed(2)}`;
+    chart.data.datasets[0].data = [pos, cont, sumSp];
+    chart.update();
+  }
+
+  // aggiungi spesa
+  addSpesaBtn.onclick = ()=>{
+    const v = voceEl.value.trim(),
+          imp = parseFloat(importoEl.value);
+    if(!v||isNaN(imp)||imp<=0) return alert('Inserisci voce e importo validi');
+    spese.push({ voce:v, importo:imp });
+    voceEl.value=''; importoEl.value='';
+    renderSpese(); updateEverything();
+  };
+
+  // listener POS e Contante
+  posEl.addEventListener('input', updateEverything);
+  contEl.addEventListener('input', updateEverything);
+
+  // salva in archivio
+  saveBtn.onclick = ()=>{
+    const archivio = JSON.parse(localStorage.getItem('archivioSpese')||'[]');
+    archivio.push({
+      giorno: giornoEl.value,
+      descrizione: descEl.value.trim(),
+      data: dataEl.value,
+      spese: [...spese],
+      pos: parseFloat(posEl.value)||0,
+      contante: parseFloat(contEl.value)||0,
+      incasso: parseFloat((parseFloat(posEl.value)||0) + (parseFloat(contEl.value)||0) + spese.reduce((a,b)=>a+b.importo,0))
+    });
+    localStorage.setItem('archivioSpese', JSON.stringify(archivio));
+    alert('Serata archiviata!');
+    // reset form
+    spese=[]; renderSpese();
+    descEl.value=''; posEl.value='0'; contEl.value='0';
+    updateEverything(); renderArchivio();
+  };
+
+  // render archivio con export/elimina
+  function renderArchivio() {
+    archiveList.innerHTML = '';
+    JSON.parse(localStorage.getItem('archivioSpese')||'[]')
+      .forEach((e,i)=>{
+        const li = document.createElement('li');
+        li.innerHTML = `
+          <strong>${e.data} – ${e.descrizione}</strong><br>
+          Spese: ${e.spese.map(s=>`${s.voce} €${s.importo.toFixed(2)}`).join(', ')}<br>
+          POS: €${e.pos.toFixed(2)}, Contante: €${e.contante.toFixed(2)}, 
+          <em>Incasso: €${e.incasso.toFixed(2)}</em>
+          <div class="entry-buttons">
+            <button class="btn btn-sm btn-secondary me-2" onclick="exportEntry(${i})">Esporta PDF</button>
+            <button class="btn btn-sm btn-danger" onclick="deleteEntry(${i})">Elimina</button>
+          </div>`;
+        archiveList.appendChild(li);
+      });
+  }
+
+  // elimina
+  function deleteEntry(idx) {
+    const a = JSON.parse(localStorage.getItem('archivioSpese')||'[]');
+    a.splice(idx,1);
+    localStorage.setItem('archivioSpese', JSON.stringify(a));
+    renderArchivio();
+  }
+
+  // esporta singola
+  function exportEntry(i) {
+    const e = JSON.parse(localStorage.getItem('archivioSpese'))[i];
+    const w = window.open('','_blank');
+    w.document.write(`
+      <h1>${e.data} – ${e.descrizione}</h1>
+      <p>POS: €${e.pos.toFixed(2)}, Contante: €${e.contante.toFixed(2)}</p>
+      <p>Spese:</p><ul>${e.spese.map(s=>`<li>${s.voce}: €${s.importo.toFixed(2)}</li>`).join('')}</ul>
+      <h3>Incasso: €${e.incasso.toFixed(2)}</h3>`);
+    w.document.close(); w.focus(); w.print(); w.close();
+  }
+
+  // esporta tutte
+  exportAll.onclick = ()=>window.print();
+
+  // avvio
+  initChart();
+  updateEverything();
+  renderArchivio();
+</script>
+</body>
+</html>
